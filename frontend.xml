@@ -3835,33 +3835,6 @@ npm run preview
 **Instituto DuocUC 2026 — DSY1106 Desarrollo Fullstack III —*
 </file>
 
-<file path=".github/workflows/frontend-ci.yml">
-name: Frontend CI Pipeline
-
-on:
-  push:
-    branches: [ "main", "master" ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: innovatech-frontend-valdes-munoz
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20.x'
-        cache: 'npm'
-        cache-dependency-path: innovatech-frontend-valdes-munoz/package-lock.json
-    - name: Install dependencies
-      run: npm ci
-    - name: Run Vitest
-      run: npm run test -- --run
-</file>
-
 <file path="innovatech-frontend-valdes-munoz/package.json">
 {
   "name": "innovatech-frontend-valdes-munoz",
@@ -4173,6 +4146,33 @@ export default defineConfig({
     },
   },
 })
+</file>
+
+<file path=".github/workflows/frontend-ci.yml">
+name: Frontend CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: innovatech-frontend-valdes-munoz
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        cache-dependency-path: innovatech-frontend-valdes-munoz/package-lock.json
+    - name: Install dependencies
+      run: npm install
+    - name: Run Vitest
+      run: npm run test -- --run
 </file>
 
 </files>
