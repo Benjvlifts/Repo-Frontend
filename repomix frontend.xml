@@ -1,0 +1,4169 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.github/workflows/frontend-ci.yml
+.repomixignore
+CodigosTest_Backend&Frontend/AuthServiceTest.java
+CodigosTest_Backend&Frontend/JwtServiceTest.java
+CodigosTest_Backend&Frontend/ProjectServiceTest.java
+innovatech-frontend-valdes-munoz/.gitignore
+innovatech-frontend-valdes-munoz/eslint.config.js
+innovatech-frontend-valdes-munoz/index.html
+innovatech-frontend-valdes-munoz/package.json
+innovatech-frontend-valdes-munoz/README.md
+innovatech-frontend-valdes-munoz/src/App.css
+innovatech-frontend-valdes-munoz/src/App.jsx
+innovatech-frontend-valdes-munoz/src/components/PrivateRoute.jsx
+innovatech-frontend-valdes-munoz/src/context/AuthContext.jsx
+innovatech-frontend-valdes-munoz/src/index.css
+innovatech-frontend-valdes-munoz/src/main.jsx
+innovatech-frontend-valdes-munoz/src/pages/dashboard/atoms.jsx
+innovatech-frontend-valdes-munoz/src/pages/dashboard/KpiView.jsx
+innovatech-frontend-valdes-munoz/src/pages/dashboard/NotificationsView.jsx
+innovatech-frontend-valdes-munoz/src/pages/dashboard/ProjectsView.jsx
+innovatech-frontend-valdes-munoz/src/pages/dashboard/ResourcesView.jsx
+innovatech-frontend-valdes-munoz/src/pages/dashboard/tokens.js
+innovatech-frontend-valdes-munoz/src/pages/DashboardPage.jsx
+innovatech-frontend-valdes-munoz/src/pages/LoginPage.jsx
+innovatech-frontend-valdes-munoz/src/pages/RegisterPage.jsx
+innovatech-frontend-valdes-munoz/src/services/analiticaService.js
+innovatech-frontend-valdes-munoz/src/services/api.js
+innovatech-frontend-valdes-munoz/src/services/authService.js
+innovatech-frontend-valdes-munoz/src/services/notifService.js
+innovatech-frontend-valdes-munoz/src/services/projectService.js
+innovatech-frontend-valdes-munoz/src/services/resourceService.js
+innovatech-frontend-valdes-munoz/vite.config.js
+README.md
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".repomixignore">
+# Dependencias
+node_modules/
+
+# Compilados de Java / Spring Boot
+target/
+.mvn/
+mvnw
+mvnw.cmd
+
+# Compilados de Frontend
+dist/
+build/
+.next/
+
+# Cachés y Logs
+.sonar/
+.git/
+*.log
+
+# Binarios y archivos pesados (que no son código)
+*.jar
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.exec
+*.zip
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/atoms.jsx">
+import { useState } from 'react'
+import { T } from './tokens.js'
+
+export const Spinner = ({ size = 20, color = T.color.brand }) => (
+  <div style={{
+    width: size, height: size,
+    border: `2px solid ${color}30`,
+    borderTopColor: color,
+    borderRadius: '50%',
+    animation: 'innovatech-spin 0.7s linear infinite',
+  }}/>
+)
+
+export const StatusBadge = ({ status }) => {
+  const map = {
+    PLANNING:    { bg:'rgba(59,130,246,0.1)',  color:'#3b82f6', label:'Planificación' },
+    IN_PROGRESS: { bg:'rgba(245,158,11,0.1)',  color:'#f59e0b', label:'En Progreso'   },
+    COMPLETED:   { bg:'rgba(16,185,129,0.1)',  color:'#10b981', label:'Completado'    },
+    ON_HOLD:     { bg:'rgba(100,116,139,0.1)', color:'#64748b', label:'En Pausa'      },
+    CANCELLED:   { bg:'rgba(239,68,68,0.1)',   color:'#ef4444', label:'Cancelado'     },
+  }
+  const cfg = map[status] || { bg:'rgba(100,116,139,0.1)', color:'#64748b', label: status }
+  return (
+    <span style={{
+      display:'inline-block', padding:'2px 10px', borderRadius:99,
+      fontSize:12, fontWeight:600, background:cfg.bg, color:cfg.color,
+    }}>
+      {cfg.label}
+    </span>
+  )
+}
+
+export const StatCard = ({ label, value, sub, accent = T.color.brand, loading }) => (
+  <div style={{
+    background:T.color.surface, border:`1px solid ${T.color.border}`,
+    borderRadius:T.radius.md, padding:'20px 24px',
+    boxShadow:T.shadow.sm, position:'relative', overflow:'hidden',
+  }}>
+    <div style={{
+      position:'absolute', top:0, left:0, width:4,
+      height:'100%', background:accent, borderRadius:'4px 0 0 4px',
+    }}/>
+    <p style={{ margin:0, fontSize:12, fontWeight:600, color:T.color.textMuted,
+                textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</p>
+    {loading
+      ? <div style={{ marginTop:12 }}><Spinner size={24} color={accent}/></div>
+      : (
+        <>
+          <p style={{ margin:'8px 0 4px', fontSize:32, fontWeight:700,
+                      color:T.color.textPrimary, lineHeight:1 }}>{value ?? '—'}</p>
+          {sub && <p style={{ margin:0, fontSize:13, color:T.color.textMuted }}>{sub}</p>}
+        </>
+      )
+    }
+  </div>
+)
+
+/** Modal overlay */
+export const Modal = ({ title, onClose, children, width = '520px' }) => (
+  <div style={{
+    position:'fixed', inset:0, background:'rgba(15,23,42,0.55)',
+    display:'flex', alignItems:'center', justifyContent:'center',
+    zIndex:1000, padding:16,
+  }}>
+    <div style={{
+      background:T.color.surface, borderRadius:T.radius.lg,
+      border:`1px solid ${T.color.border}`, width, maxWidth:'100%',
+      maxHeight:'90vh', overflowY:'auto', padding:28,
+      boxShadow:T.shadow.lg,
+    }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+        <h3 style={{ margin:0, fontSize:17, fontWeight:700, color:T.color.textPrimary }}>{title}</h3>
+        <button onClick={onClose} style={{
+          background:'none', border:'none', color:T.color.textMuted,
+          fontSize:22, cursor:'pointer', lineHeight:1, padding:'2px 6px',
+        }}>×</button>
+      </div>
+      {children}
+    </div>
+  </div>
+)
+
+export const Btn = ({ children, onClick, type = 'button', disabled, variant = 'primary' }) => {
+  const vs = {
+    primary: { background:T.color.brand,   color:'#fff'                  },
+    danger:  { background:T.color.error,   color:'#fff'                  },
+    ghost:   { background:'transparent',   color:T.color.textSecondary,
+               border:`1px solid ${T.color.border}`                      },
+    success: { background:T.color.success, color:'#fff'                  },
+  }
+  return (
+    <button type={type} onClick={onClick} disabled={disabled} style={{
+      ...vs[variant],
+      padding:'7px 16px', borderRadius:T.radius.sm,
+      border: vs[variant].border || 'none',
+      fontSize:13, fontWeight:600,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.55 : 1,
+      transition:'opacity .15s',
+    }}>
+      {children}
+    </button>
+  )
+}
+
+export const FieldRow = ({ label, children }) => (
+  <div style={{ marginBottom:14 }}>
+    <label style={{ display:'block', fontSize:12, fontWeight:600,
+                    color:T.color.textMuted, marginBottom:5,
+                    textTransform:'uppercase', letterSpacing:'0.05em' }}>
+      {label}
+    </label>
+    {children}
+  </div>
+)
+
+export const TextInput = ({ value, onChange, placeholder, type = 'text' }) => (
+  <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={{
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box',
+  }}/>
+)
+
+export const SelectInput = ({ value, onChange, options, placeholder }) => (
+  <select value={value} onChange={onChange} style={{
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box', cursor:'pointer',
+  }}>
+    {placeholder && <option value="">{placeholder}</option>}
+    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+  </select>
+)
+
+export const ErrorBanner = ({ message, onRetry }) => (
+  <div style={{
+    padding:'10px 16px', borderRadius:T.radius.sm,
+    background:'rgba(239,68,68,0.06)', border:`1px solid rgba(239,68,68,0.2)`,
+    color:T.color.error, fontSize:13, marginBottom:16,
+    display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
+  }}>
+    <span>⚠ {message}</span>
+    {onRetry && <Btn onClick={onRetry} variant="ghost">Reintentar</Btn>}
+  </div>
+)
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/KpiView.jsx">
+import { useState, useEffect } from 'react'
+import { getSummary } from '../../services/analiticaService.js'
+import { T } from './tokens.js'
+import { Spinner, StatCard, StatusBadge, ErrorBanner } from './atoms.jsx'
+
+export default function KpiView() {
+  const [summary, setSummary] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState(null)
+
+  const fetchSummary = async () => {
+    setLoading(true); setError(null)
+    try { setSummary(await getSummary()) }
+    catch (err) { setError(err?.message || 'Error cargando métricas') }
+    finally { setLoading(false) }   // BUG 2 FIX
+  }
+
+  useEffect(() => { fetchSummary() }, [])
+
+  return (
+    <div>
+      <div style={{ marginBottom:28 }}>
+        <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Métricas y KPIs</h1>
+        <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>
+          Indicadores de desempeño organizacional en tiempo real.
+        </p>
+      </div>
+
+      {error && <ErrorBanner message={error} onRetry={fetchSummary}/>}
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:28 }}>
+        <StatCard label="Total proyectos"     value={summary?.totalProjects}    loading={loading} accent={T.color.brand}   />
+        <StatCard label="Completitud prom."   value={summary ? `${(summary.averageCompletion??0).toFixed(1)}%` : null}
+                  loading={loading} accent={T.color.success}/>
+        <StatCard label="Proyectos activos"   value={summary?.activeProjects}   loading={loading} accent={T.color.warning} />
+        <StatCard label="Completados"         value={summary?.completedProjects} loading={loading} accent={T.color.info}   />
+      </div>
+
+      {!loading && summary?.metrics?.length > 0 && (
+        <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                      borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+          <div style={{ padding:'14px 24px', borderBottom:`1px solid ${T.color.border}` }}>
+            <span style={{ fontWeight:600, fontSize:15, color:T.color.textPrimary }}>Métricas por Proyecto</span>
+          </div>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:T.color.bg }}>
+                  {['Proyecto','Estado','Completitud','Tareas Activas','Última Actualización'].map(h => (
+                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
+                                         fontWeight:600, color:T.color.textMuted,
+                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {summary.metrics.map((m, i) => (
+                  <tr key={m.projectId} style={{
+                    borderTop:`1px solid ${T.color.border}`,
+                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
+                  }}>
+                    <td style={{ padding:'11px 16px', fontWeight:500, color:T.color.textPrimary }}>#{m.projectId}</td>
+                    <td style={{ padding:'11px 16px' }}><StatusBadge status={m.projectStatus}/></td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                        <div style={{ flex:1, height:6, background:T.color.bg, borderRadius:99, overflow:'hidden' }}>
+                          <div style={{
+                            height:'100%', borderRadius:99,
+                            width:`${m.completionPercentage ?? 0}%`,
+                            background: (m.completionPercentage??0)>=80 ? T.color.success
+                                      : (m.completionPercentage??0)>=40 ? T.color.warning
+                                      : T.color.error,
+                          }}/>
+                        </div>
+                        <span style={{ fontSize:13, fontWeight:600, minWidth:36 }}>
+                          {(m.completionPercentage??0).toFixed(0)}%
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary }}>{m.activeTasks}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textMuted, fontSize:12 }}>
+                      {m.lastUpdated ? new Date(m.lastUpdated).toLocaleDateString('es-CL') : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/NotificationsView.jsx">
+import { useState, useEffect, useCallback } from 'react'
+import { getProjects } from '../../services/projectService.js'
+import { getNotifications, markAsRead } from '../../services/notifService.js'
+import { T } from './tokens.js'
+import { Spinner } from './atoms.jsx'
+
+export default function NotificationsView() {
+  const [projects,       setProjects]       = useState([])
+  const [selectedId,     setSelectedId]     = useState(null)
+  const [notifications,  setNotifications]  = useState([])
+  const [loadingProj,    setLoadingProj]    = useState(true)
+  const [loadingNotif,   setLoadingNotif]   = useState(false)
+
+  useEffect(() => {
+    getProjects()
+      .then(data => {
+        const list = Array.isArray(data) ? data : []
+        setProjects(list)
+        if (list.length > 0) setSelectedId(list[0].id)
+      })
+      .catch(() => {})
+      .finally(() => setLoadingProj(false))   // BUG 2 FIX
+  }, [])
+
+  useEffect(() => {
+    if (!selectedId) return
+    setLoadingNotif(true)
+    getNotifications(selectedId)
+      .then(d => setNotifications(Array.isArray(d) ? d : []))
+      .catch(() => setNotifications([]))
+      .finally(() => setLoadingNotif(false))   // BUG 2 FIX
+  }, [selectedId])
+
+  const handleMarkRead = useCallback(async (id) => {
+    await markAsRead(id).catch(() => {})
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read:true } : n))
+  }, [])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  return (
+    <div>
+      <div style={{ marginBottom:28 }}>
+        <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Notificaciones</h1>
+        <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>
+          Alertas generadas por eventos en los proyectos.
+        </p>
+      </div>
+
+      {/* Selector de proyecto */}
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, padding:'16px 24px',
+                    boxShadow:T.shadow.sm, marginBottom:20,
+                    display:'flex', alignItems:'center', gap:16 }}>
+        <label style={{ fontSize:14, fontWeight:600, color:T.color.textPrimary, whiteSpace:'nowrap' }}>Proyecto:</label>
+        {loadingProj ? <Spinner size={18}/> : (
+          <select
+            value={selectedId || ''}
+            onChange={e => setSelectedId(Number(e.target.value))}
+            style={{
+              flex:1, maxWidth:360, padding:'8px 12px', borderRadius:T.radius.sm,
+              border:`1px solid ${T.color.border}`, fontSize:14,
+              color:T.color.textPrimary, background:T.color.surface, outline:'none', cursor:'pointer',
+            }}
+          >
+            {projects.length === 0
+              ? <option value="">Sin proyectos disponibles</option>
+              : projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)
+            }
+          </select>
+        )}
+        {unreadCount > 0 && (
+          <span style={{
+            background:T.color.error, color:'#fff', borderRadius:99,
+            fontSize:12, fontWeight:700, padding:'2px 9px',
+          }}>
+            {unreadCount} sin leer
+          </span>
+        )}
+      </div>
+
+      {/* Lista */}
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+        {loadingNotif ? (
+          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
+        ) : notifications.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center' }}>
+            <div style={{ fontSize:36, marginBottom:12 }}>🔔</div>
+            <p style={{ color:T.color.textMuted, fontSize:14, margin:0 }}>
+              No hay notificaciones para este proyecto.
+            </p>
+          </div>
+        ) : (
+          <ul style={{ margin:0, padding:0, listStyle:'none' }}>
+            {notifications.map((n, i) => (
+              <li key={n.id} style={{
+                padding:'14px 24px', borderTop: i>0 ? `1px solid ${T.color.border}` : 'none',
+                display:'flex', alignItems:'flex-start', gap:14,
+                background: n.read ? T.color.surface : `${T.color.brand}08`,
+              }}>
+                <div style={{
+                  width:9, height:9, borderRadius:'50%', marginTop:5, flexShrink:0,
+                  background: n.read ? T.color.border : T.color.brand,
+                }}/>
+                <div style={{ flex:1 }}>
+                  <p style={{ margin:0, fontSize:14, color:T.color.textPrimary, lineHeight:1.5 }}>{n.message}</p>
+                  <p style={{ margin:'3px 0 0', fontSize:12, color:T.color.textMuted }}>
+                    {n.createdAt ? new Date(n.createdAt).toLocaleString('es-CL') : ''}
+                  </p>
+                </div>
+                {!n.read && (
+                  <button onClick={() => handleMarkRead(n.id)} style={{
+                    background:'transparent', border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.sm, padding:'4px 12px', fontSize:12,
+                    color:T.color.textSecondary, cursor:'pointer', whiteSpace:'nowrap',
+                  }}>
+                    Marcar leída
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/ProjectsView.jsx">
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../../context/AuthContext.jsx'
+import {
+  getProjects, createProject, updateProject, deleteProject,
+  updateProjectStatus, assignEmployee, unassignEmployee,
+  getNotes, addNote, reviewNote,
+} from '../../services/projectService.js'
+import { getEmployees } from '../../services/authService.js'
+import { T } from './tokens.js'
+import { Spinner, StatusBadge, StatCard, Modal, Btn, FieldRow, TextInput, SelectInput, ErrorBanner } from './atoms.jsx'
+
+const TYPES    = ['SOFTWARE', 'CONSULTING', 'INFRASTRUCTURE']
+const STATUSES = ['PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED']
+const STATUS_LABELS = {
+  PLANNING:'Planificación', IN_PROGRESS:'En Progreso',
+  ON_HOLD:'En Pausa', COMPLETED:'Completado', CANCELLED:'Cancelado',
+}
+
+export default function ProjectsView({ user }) {
+  const isAdmin   = user?.role === 'ADMIN'
+  const isManager = user?.role === 'MANAGER' || isAdmin
+
+  const [projects,     setProjects]     = useState([])
+  const [employees,    setEmployees]    = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [error,        setError]        = useState(null)
+  const [filterStatus, setFilterStatus] = useState('')
+
+  // modal: null | 'create' | 'edit' | 'assign' | 'notes'
+  const [modal,        setModal]        = useState(null)
+  const [activeProj,   setActiveProj]   = useState(null)
+  const [form,         setForm]         = useState({})
+  const [formError,    setFormError]    = useState(null)
+  const [submitting,   setSubmitting]   = useState(false)
+
+  const [notes,        setNotes]        = useState([])
+  const [notesLoading, setNotesLoading] = useState(false)
+  const [newNote,      setNewNote]      = useState('')
+
+  // ── Fetch ────────────────────────────────────────────────────────────────
+  const fetchProjects = useCallback(async () => {
+    setLoading(true); setError(null)
+    try {
+      const params = filterStatus ? { status: filterStatus } : {}
+      const data = await getProjects(params)
+      setProjects(Array.isArray(data) ? data : [])
+    } catch (err) {
+      setError(err?.message || 'Error al cargar proyectos')
+      setProjects([])
+    } finally { setLoading(false) }       // BUG 2 FIX: finally garantiza que loading se apaga
+  }, [filterStatus])
+
+  useEffect(() => { fetchProjects() }, [fetchProjects])
+
+  const fetchEmployees = async () => {
+    try { setEmployees(Array.isArray(await getEmployees()) ? await getEmployees() : []) }
+    catch { setEmployees([]) }
+  }
+
+  const fetchNotes = async (projectId) => {
+    setNotesLoading(true)
+    try { setNotes(Array.isArray(await getNotes(projectId)) ? await getNotes(projectId) : []) }
+    catch { setNotes([]) }
+    finally { setNotesLoading(false) }
+  }
+
+  // ── Modal helpers ────────────────────────────────────────────────────────
+  const closeModal = () => { setModal(null); setActiveProj(null); setFormError(null); setForm({}) }
+
+  const openCreate = () => {
+    setForm({ name:'', description:'', type:'SOFTWARE', managerId: user?.id ?? '' })
+    setFormError(null); setModal('create')
+  }
+
+  const openEdit = (p) => {
+    setActiveProj(p)
+    setForm({ name:p.name||'', description:p.description||'', type:p.type||'SOFTWARE' })
+    setFormError(null); setModal('edit')
+  }
+
+  const openAssign = async (p) => {
+    setActiveProj(p)
+    setForm({ employeeId: p.assignedUserId ?? '' })
+    setFormError(null)
+    await fetchEmployees()
+    setModal('assign')
+  }
+
+  const openNotes = async (p) => {
+    setActiveProj(p); setNewNote('')
+    await fetchNotes(p.id); setModal('notes')
+  }
+
+  // ── Submit handlers ──────────────────────────────────────────────────────
+  const withSubmit = (fn) => async (e) => {
+    e?.preventDefault(); setSubmitting(true); setFormError(null)
+    try { await fn(); closeModal(); fetchProjects() }
+    catch (err) { setFormError(err?.message || 'Error') }
+    finally { setSubmitting(false) }
+  }
+
+  const handleCreate     = withSubmit(() => createProject(form))
+  const handleEdit       = withSubmit(() => updateProject(activeProj.id, form))
+  const handleDelete = async (p) => {
+    if (!window.confirm(`¿Eliminar "${p.name}"?`)) return
+    try { await deleteProject(p.id); fetchProjects() } catch { /* silent */ }
+  }
+  const handleStatusChange = async (p, st) => {
+    try { await updateProjectStatus(p.id, st); fetchProjects() } catch { /* silent */ }
+  }
+  const handleAssign = withSubmit(async () => {
+    if (form.employeeId) {
+      const emp = employees.find(e => String(e.id) === String(form.employeeId))
+      await assignEmployee(activeProj.id, form.employeeId, emp?.name ?? '')
+    } else {
+      await unassignEmployee(activeProj.id)
+    }
+  })
+  const handleAddNote = async (e) => {
+    e.preventDefault()
+    if (!newNote.trim()) return
+    setSubmitting(true)
+    try { await addNote(activeProj.id, newNote.trim()); setNewNote(''); await fetchNotes(activeProj.id) }
+    catch { /* silent */ } finally { setSubmitting(false) }
+  }
+  const handleReviewNote = async (noteId, status) => {
+    try { await reviewNote(activeProj.id, noteId, { status, reviewComment:'' }); await fetchNotes(activeProj.id) }
+    catch { /* silent */ }
+  }
+
+  const setF = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+
+  const stats = {
+    total:      projects.length,
+    inProgress: projects.filter(p => p.status === 'IN_PROGRESS').length,
+    completed:  projects.filter(p => p.status === 'COMPLETED').length,
+    planning:   projects.filter(p => p.status === 'PLANNING').length,
+  }
+
+  const inputStyle = {
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box',
+  }
+
+  return (
+    <div>
+      {/* Header row */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24, flexWrap:'wrap', gap:12 }}>
+        <div>
+          <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Gestión de Proyectos</h1>
+          <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>Planificación, ejecución y seguimiento.</p>
+        </div>
+        <div style={{ display:'flex', gap:10, alignItems:'center', flexWrap:'wrap' }}>
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            style={{ ...inputStyle, width:'auto' }}
+          >
+            <option value="">Todos los estados</option>
+            {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+          </select>
+          {isManager && (
+            <button onClick={openCreate} style={{
+              background:T.color.brand, color:'#fff', border:'none',
+              padding:'8px 16px', borderRadius:T.radius.sm, fontSize:13, fontWeight:600, cursor:'pointer',
+            }}>
+              + Nuevo Proyecto
+            </button>
+          )}
+          <button onClick={fetchProjects} style={{
+            background:'transparent', color:T.color.textSecondary,
+            border:`1px solid ${T.color.border}`, padding:'8px 14px',
+            borderRadius:T.radius.sm, fontSize:13, cursor:'pointer',
+          }}>
+            ↺ Actualizar
+          </button>
+        </div>
+      </div>
+
+      {/* KPI cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:24 }}>
+        <StatCard label="Total"        value={stats.total}      loading={loading} accent={T.color.brand}   />
+        <StatCard label="En progreso"  value={stats.inProgress} loading={loading} accent={T.color.warning} />
+        <StatCard label="Completados"  value={stats.completed}  loading={loading} accent={T.color.success} />
+        <StatCard label="Planificación"value={stats.planning}   loading={loading} accent={T.color.info}    />
+      </div>
+
+      {error && <ErrorBanner message={error} onRetry={fetchProjects}/>}
+
+      {/* Table */}
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+        {loading ? (
+          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
+        ) : projects.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center', color:T.color.textMuted }}>
+            <div style={{ fontSize:36, marginBottom:10 }}>📂</div>
+            No hay proyectos{filterStatus ? ` con estado "${STATUS_LABELS[filterStatus]}"` : ''}.
+          </div>
+        ) : (
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:T.color.bg }}>
+                  {['#','Nombre','Tipo','Estado','Asignado a','Acciones'].map(h => (
+                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
+                                         fontWeight:600, color:T.color.textMuted,
+                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map((p, i) => (
+                  <tr key={p.id} style={{
+                    borderTop:`1px solid ${T.color.border}`,
+                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
+                  }}>
+                    <td style={{ padding:'11px 16px', color:T.color.textMuted, fontSize:13 }}>#{p.id}</td>
+                    <td style={{ padding:'11px 16px', fontWeight:600, color:T.color.textPrimary, fontSize:14 }}>{p.name}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{p.type}</td>
+                    <td style={{ padding:'11px 16px' }}>
+                      {isManager ? (
+                        <select
+                          value={p.status}
+                          onChange={e => handleStatusChange(p, e.target.value)}
+                          style={{ ...inputStyle, width:'auto', padding:'3px 8px', fontSize:12, fontWeight:600 }}
+                        >
+                          {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+                        </select>
+                      ) : (
+                        <StatusBadge status={p.status}/>
+                      )}
+                    </td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>
+                      {p.assignedUserName || <span style={{ fontStyle:'italic' }}>Sin asignar</span>}
+                    </td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                        <Btn onClick={() => openNotes(p)} variant="ghost">📋 Notas</Btn>
+                        {isManager && (
+                          <>
+                            <Btn onClick={() => openEdit(p)} variant="ghost">✏ Editar</Btn>
+                            <Btn onClick={() => openAssign(p)} variant="ghost">👤 Asignar</Btn>
+                          </>
+                        )}
+                        {isAdmin && <Btn onClick={() => handleDelete(p)} variant="danger">🗑</Btn>}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ── Modal Crear ──────────────────────────────────────────────────────── */}
+      {modal === 'create' && (
+        <Modal title="Nuevo Proyecto" onClose={closeModal}>
+          <form onSubmit={handleCreate}>
+            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre del proyecto"/></FieldRow>
+            <FieldRow label="Descripción">
+              <textarea value={form.description} onChange={setF('description')} rows={3}
+                style={{ ...inputStyle, resize:'vertical' }} placeholder="Descripción opcional"/>
+            </FieldRow>
+            <FieldRow label="Tipo *">
+              <SelectInput value={form.type} onChange={setF('type')} options={TYPES.map(t => ({ value:t, label:t }))}/>
+            </FieldRow>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Creando…' : 'Crear Proyecto'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Modal Editar ─────────────────────────────────────────────────────── */}
+      {modal === 'edit' && activeProj && (
+        <Modal title={`Editar: ${activeProj.name}`} onClose={closeModal}>
+          <form onSubmit={handleEdit}>
+            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre"/></FieldRow>
+            <FieldRow label="Descripción">
+              <textarea value={form.description} onChange={setF('description')} rows={3}
+                style={{ ...inputStyle, resize:'vertical' }}/>
+            </FieldRow>
+            <FieldRow label="Tipo">
+              <SelectInput value={form.type} onChange={setF('type')} options={TYPES.map(t => ({ value:t, label:t }))}/>
+            </FieldRow>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Guardando…' : 'Guardar'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Modal Asignar ────────────────────────────────────────────────────── */}
+      {modal === 'assign' && activeProj && (
+        <Modal title={`Asignar empleado — ${activeProj.name}`} onClose={closeModal} width="420px">
+          <form onSubmit={handleAssign}>
+            <FieldRow label="Empleado">
+              <SelectInput
+                value={form.employeeId}
+                onChange={setF('employeeId')}
+                placeholder="Sin asignar"
+                options={employees.map(e => ({ value: e.id, label: `${e.name || e.email}` }))}
+              />
+            </FieldRow>
+            <p style={{ color:T.color.textMuted, fontSize:12, margin:'0 0 16px' }}>
+              Selecciona "Sin asignar" para retirar la asignación actual.
+            </p>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Guardando…' : 'Confirmar'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Modal Notas ──────────────────────────────────────────────────────── */}
+      {modal === 'notes' && activeProj && (
+        <Modal title={`Notas — ${activeProj.name}`} onClose={closeModal} width="600px">
+          {notesLoading ? (
+            <div style={{ padding:24, display:'flex', justifyContent:'center' }}><Spinner/></div>
+          ) : notes.length === 0 ? (
+            <p style={{ color:T.color.textMuted, textAlign:'center', fontStyle:'italic', margin:'8px 0 20px' }}>
+              Sin notas de avance.
+            </p>
+          ) : (
+            <div style={{ maxHeight:320, overflowY:'auto', marginBottom:20 }}>
+              {notes.map(n => (
+                <div key={n.id} style={{
+                  background:T.color.bg, borderRadius:T.radius.sm,
+                  border:`1px solid ${T.color.border}`, padding:14, marginBottom:10,
+                }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
+                    <span style={{ color:T.color.textMuted, fontSize:12 }}>
+                      {n.authorName || `#${n.authorId}`} · {n.createdAt ? new Date(n.createdAt).toLocaleDateString('es-CL') : ''}
+                    </span>
+                    <StatusBadge status={n.status === 'APPROVED' ? 'COMPLETED' : n.status === 'REJECTED' ? 'CANCELLED' : 'PLANNING'}/>
+                  </div>
+                  <p style={{ color:T.color.textPrimary, margin:'0 0 8px', fontSize:14 }}>{n.content}</p>
+                  {n.reviewComment && (
+                    <p style={{ color:T.color.textMuted, fontSize:12, fontStyle:'italic', margin:'0 0 8px' }}>
+                      Revisión: {n.reviewComment}
+                    </p>
+                  )}
+                  {isManager && n.status === 'PENDING' && (
+                    <div style={{ display:'flex', gap:8 }}>
+                      <Btn onClick={() => handleReviewNote(n.id, 'APPROVED')} variant="success">✓ Aprobar</Btn>
+                      <Btn onClick={() => handleReviewNote(n.id, 'REJECTED')} variant="danger">✗ Rechazar</Btn>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ borderTop:`1px solid ${T.color.border}`, paddingTop:16 }}>
+            <form onSubmit={handleAddNote} style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
+              <textarea
+                value={newNote}
+                onChange={e => setNewNote(e.target.value)}
+                placeholder="Escribe una nota de avance…"
+                rows={2}
+                style={{
+                  flex:1, padding:'8px 12px', borderRadius:T.radius.sm,
+                  border:`1px solid ${T.color.border}`, fontSize:14,
+                  color:T.color.textPrimary, background:T.color.surface,
+                  resize:'none', boxSizing:'border-box',
+                }}
+              />
+              <Btn type="submit" disabled={submitting || !newNote.trim()}>
+                {submitting ? '…' : 'Agregar'}
+              </Btn>
+            </form>
+          </div>
+        </Modal>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/ResourcesView.jsx">
+import { useState, useEffect, useCallback } from 'react'
+import {
+  getResources, getAvailableResources,
+  createResource, deleteResource, updateAvailability,
+} from '../../services/resourceService.js'
+import { T } from './tokens.js'
+import { Spinner, StatCard, Modal, Btn, FieldRow, TextInput, SelectInput, ErrorBanner } from './atoms.jsx'
+
+const DEPARTMENTS = ['Engineering', 'Design', 'QA', 'DevOps', 'Management', 'Consulting']
+const ROLES       = ['DEVELOPER', 'DESIGNER', 'QA', 'DEVOPS', 'MANAGER', 'CONSULTANT']
+
+const ROLE_COLOR = {
+  DEVELOPER:'#6366f1', DESIGNER:'#ec4899',
+  QA:'#f59e0b',        DEVOPS:'#14b8a6',
+  MANAGER:'#8b5cf6',   CONSULTANT:'#f97316',
+}
+
+export default function ResourcesView({ user }) {
+  const isAdmin = user?.role === 'ADMIN'
+
+  const [resources,  setResources]  = useState([])
+  const [available,  setAvailable]  = useState([])
+  const [loading,    setLoading]    = useState(true)
+  const [error,      setError]      = useState(null)
+  const [modal,      setModal]      = useState(null)   // null | 'create'
+  const [form,       setForm]       = useState({})
+  const [formError,  setFormError]  = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  const fetchAll = useCallback(async () => {
+    setLoading(true); setError(null)
+    try {
+      const [all, avail] = await Promise.all([getResources(), getAvailableResources()])
+      setResources(Array.isArray(all) ? all : [])
+      setAvailable(Array.isArray(avail) ? avail : [])
+    } catch (err) {
+      setError(err?.message || 'Error al cargar recursos')
+      setResources([]); setAvailable([])
+    } finally { setLoading(false) }      // BUG 2 FIX: finally garantiza que loading se apaga
+  }, [])
+
+  useEffect(() => { fetchAll() }, [fetchAll])
+
+  const openCreate = () => {
+    setForm({ name:'', email:'', department: DEPARTMENTS[0], role:'DEVELOPER' })
+    setFormError(null); setModal('create')
+  }
+  const closeModal = () => { setModal(null); setFormError(null); setForm({}) }
+
+  const handleCreate = async (e) => {
+    e.preventDefault(); setSubmitting(true); setFormError(null)
+    try { await createResource(form); closeModal(); fetchAll() }
+    catch (err) { setFormError(err?.message || 'Error al crear recurso') }
+    finally { setSubmitting(false) }
+  }
+
+  const handleToggleAvailability = async (r) => {
+    try { await updateAvailability(r.id, !r.available); fetchAll() }
+    catch { /* silent */ }
+  }
+
+  const handleDelete = async (r) => {
+    if (!window.confirm(`¿Eliminar a "${r.name}"?`)) return
+    try { await deleteResource(r.id); fetchAll() }
+    catch { /* silent */ }
+  }
+
+  const setF = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+
+  const inputStyle = {
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box',
+  }
+
+  return (
+    <div>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24 }}>
+        <div>
+          <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Recursos Humanos</h1>
+          <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>Disponibilidad y asignación del equipo.</p>
+        </div>
+        <div style={{ display:'flex', gap:10 }}>
+          {isAdmin && (
+            <button onClick={openCreate} style={{
+              background:T.color.brand, color:'#fff', border:'none',
+              padding:'8px 16px', borderRadius:T.radius.sm, fontSize:13, fontWeight:600, cursor:'pointer',
+            }}>
+              + Nuevo Recurso
+            </button>
+          )}
+          <button onClick={fetchAll} style={{
+            background:'transparent', color:T.color.textSecondary,
+            border:`1px solid ${T.color.border}`, padding:'8px 14px',
+            borderRadius:T.radius.sm, fontSize:13, cursor:'pointer',
+          }}>
+            ↺ Actualizar
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:24 }}>
+        <StatCard label="Total"       value={resources.length}                     loading={loading} accent={T.color.brand}   />
+        <StatCard label="Disponibles" value={available.length}                     loading={loading} accent={T.color.success} />
+        <StatCard label="Asignados"   value={resources.length - available.length}  loading={loading} accent={T.color.warning} />
+        <StatCard label="Ocupación"
+          value={resources.length > 0 ? `${Math.round((1-available.length/resources.length)*100)}%` : '—'}
+          loading={loading} accent={T.color.info}/>
+      </div>
+
+      {error && <ErrorBanner message={error} onRetry={fetchAll}/>}
+
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+        {loading ? (
+          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
+        ) : resources.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center', color:T.color.textMuted }}>
+            <div style={{ fontSize:36, marginBottom:10 }}>👥</div>
+            No hay recursos registrados.
+          </div>
+        ) : (
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:T.color.bg }}>
+                  {['Nombre','Email','Departamento','Rol','Estado','Acciones'].map(h => (
+                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
+                                         fontWeight:600, color:T.color.textMuted,
+                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {resources.map((r, i) => (
+                  <tr key={r.id} style={{
+                    borderTop:`1px solid ${T.color.border}`,
+                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
+                  }}>
+                    <td style={{ padding:'11px 16px', fontWeight:600, color:T.color.textPrimary, fontSize:14 }}>{r.name}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{r.email}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{r.department}</td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <span style={{
+                        display:'inline-block', padding:'2px 10px', borderRadius:99,
+                        fontSize:12, fontWeight:600,
+                        background:`${ROLE_COLOR[r.role]||T.color.brand}18`,
+                        color: ROLE_COLOR[r.role] || T.color.brand,
+                      }}>
+                        {r.role}
+                      </span>
+                    </td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <span style={{
+                        display:'inline-flex', alignItems:'center', gap:6,
+                        fontSize:13, fontWeight:500,
+                        color: r.available ? T.color.success : T.color.warning,
+                      }}>
+                        <span style={{
+                          width:8, height:8, borderRadius:'50%',
+                          background: r.available ? T.color.success : T.color.warning,
+                        }}/>
+                        {r.available ? 'Disponible' : 'Asignado'}
+                      </span>
+                    </td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <div style={{ display:'flex', gap:6 }}>
+                        {isAdmin && (
+                          <>
+                            <Btn onClick={() => handleToggleAvailability(r)} variant="ghost">
+                              {r.available ? '🔒 Asignar' : '🔓 Liberar'}
+                            </Btn>
+                            <Btn onClick={() => handleDelete(r)} variant="danger">🗑</Btn>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Modal Crear Recurso */}
+      {modal === 'create' && (
+        <Modal title="Nuevo Recurso" onClose={closeModal}>
+          <form onSubmit={handleCreate}>
+            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre completo"/></FieldRow>
+            <FieldRow label="Email *"><TextInput value={form.email} onChange={setF('email')} placeholder="correo@empresa.cl" type="email"/></FieldRow>
+            <FieldRow label="Departamento">
+              <SelectInput value={form.department} onChange={setF('department')}
+                options={DEPARTMENTS.map(d => ({ value:d, label:d }))}/>
+            </FieldRow>
+            <FieldRow label="Rol">
+              <SelectInput value={form.role} onChange={setF('role')}
+                options={ROLES.map(r => ({ value:r, label:r }))}/>
+            </FieldRow>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Creando…' : 'Crear Recurso'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/tokens.js">
+/** Design tokens compartidos entre todas las vistas del Dashboard. */
+export const T = {
+  sidebar: { width: 248 },
+  header:  { height: 64 },
+  color: {
+    sidebarBg:        '#0f172a',
+    sidebarBorder:    'rgba(255,255,255,0.06)',
+    sidebarText:      '#64748b',
+    sidebarTextHover: '#cbd5e1',
+    sidebarActive:    '#a5b4fc',
+    sidebarActiveBg:  'rgba(99,102,241,0.14)',
+    sidebarActiveBar: '#6366f1',
+    sidebarHover:     'rgba(255,255,255,0.04)',
+    brand:            '#6366f1',
+    brandDark:        '#4f46e5',
+    brandLight:       '#e0e7ff',
+    bg:               '#f1f5f9',
+    surface:          '#ffffff',
+    border:           '#e2e8f0',
+    borderSoft:       '#f1f5f9',
+    textPrimary:      '#0f172a',
+    textSecondary:    '#475569',
+    textMuted:        '#94a3b8',
+    success:          '#10b981',
+    warning:          '#f59e0b',
+    error:            '#ef4444',
+    info:             '#3b82f6',
+    roleAdmin:    { bg:'rgba(124,58,237,0.1)',  color:'#7c3aed', border:'rgba(124,58,237,0.25)' },
+    roleManager:  { bg:'rgba(8,145,178,0.1)',   color:'#0891b2', border:'rgba(8,145,178,0.25)'  },
+    roleEmployee: { bg:'rgba(5,150,105,0.1)',   color:'#059669', border:'rgba(5,150,105,0.25)'  },
+  },
+  shadow: {
+    sm: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
+    md: '0 4px 12px rgba(0,0,0,0.08)',
+    lg: '0 10px 30px rgba(0,0,0,0.12)',
+  },
+  radius: { sm:'6px', md:'10px', lg:'16px' },
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/analiticaService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/v1/analitica'
+
+export const getAllMetrics     = ()          => call(() => api.get(`${BASE}/metricas`).then(r => r.data))
+export const getProjectMetrics = (projectId) => call(() => api.get(`${BASE}/metricas/proyecto/${projectId}`).then(r => r.data))
+export const getSummary        = ()          => call(() => api.get(`${BASE}/resumen`).then(r => r.data))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/api.js">
+/**
+ * Centralized Axios instance.
+ * ROOT CAUSE BUG 2: los servicios usaban localStorage.getItem('token')
+ * pero AuthContext persiste con clave 'innovatech_token'.
+ * Este interceptor unifica la clave y añade timeout para evitar spinners infinitos.
+ */
+import axios from 'axios'
+
+const TOKEN_KEY = 'innovatech_token'
+
+const api = axios.create({
+  timeout: 10000, // 10 s — previene loading infinito si el BFF no responde
+})
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY)
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+/** Normaliza cualquier error de Axios en un objeto {message, status} */
+export function parseError(err) {
+  if (err.response) {
+    const msg = err.response.data?.message || err.response.data?.error || 'Error del servidor'
+    return { message: msg, status: err.response.status }
+  }
+  if (err.request) return { message: 'No se pudo conectar con el servidor', status: 0 }
+  return { message: err.message || 'Error inesperado', status: -1 }
+}
+
+/** Wrapper que normaliza errores y garantiza que siempre lanza {message,status} */
+export async function call(fn) {
+  try {
+    return await fn()
+  } catch (err) {
+    throw parseError(err)
+  }
+}
+
+export default api
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/notifService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/v1/notificaciones'
+
+export const getNotifications      = (projectId)      => call(() => api.get(`${BASE}/proyecto/${projectId}`).then(r => r.data))
+export const getUnreadNotifications= (projectId)      => call(() => api.get(`${BASE}/proyecto/${projectId}/no-leidas`).then(r => r.data))
+export const markAsRead            = (notificationId) => call(() => api.patch(`${BASE}/${notificationId}/read`, {}))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/resourceService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/resources'
+
+export const getResources           = ()                          => call(() => api.get(`${BASE}/`).then(r => r.data))
+export const getAvailableResources  = ()                          => call(() => api.get(`${BASE}/available`).then(r => r.data))
+export const getResourcesByDepartment=(dept)                      => call(() => api.get(`${BASE}/department/${encodeURIComponent(dept)}`).then(r => r.data))
+export const getResourceById        = (id)                        => call(() => api.get(`${BASE}/${id}`).then(r => r.data))
+export const createResource         = (data)                      => call(() => api.post(`${BASE}/`, data).then(r => r.data))
+export const updateAvailability     = (id, available)             => call(() => api.patch(`${BASE}/${id}/availability`, { available }).then(r => r.data))
+export const assignResourceToProject= (id, projectId, projectName)=> call(() => api.patch(`${BASE}/${id}/assign`, { projectId, projectName }).then(r => r.data))
+export const deleteResource         = (id)                        => call(() => api.delete(`${BASE}/${id}`))
+</file>
+
+<file path=".github/workflows/frontend-ci.yml">
+name: Frontend CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run Vitest
+      run: npm run test -- --run
+</file>
+
+<file path="CodigosTest_Backend&Frontend/AuthServiceTest.java">
+package com.innovatech.auth;
+
+import com.innovatech.auth.dto.AuthDtos.*;
+import com.innovatech.auth.model.User;
+import com.innovatech.auth.repository.JpaUserRepository;
+import com.innovatech.auth.security.JwtService;
+import com.innovatech.auth.service.AuthService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+/**
+ * Pruebas unitarias para AuthService.
+ * Cubre: registro, login, validación de token, consulta de usuarios.
+ * Cobertura objetivo: ≥80% de AuthService.
+ *
+ * @author Benjamin Valdes, Ignacio Munoz
+ */
+@ExtendWith(MockitoExtension.class)
+@DisplayName("AuthService — Pruebas Unitarias")
+class AuthServiceTest {
+
+    @Mock private JpaUserRepository userRepository;
+    @Mock private PasswordEncoder passwordEncoder;
+    @Mock private JwtService jwtService;
+
+    @InjectMocks
+    private AuthService authService;
+
+    private User sampleUser;
+    private RegisterRequest registerRequest;
+    private LoginRequest loginRequest;
+
+    @BeforeEach
+    void setUp() {
+        sampleUser = User.builder()
+                .id(1L)
+                .name("Benjamin Valdes")
+                .email("benjamin@innovatech.cl")
+                .password("hashed_password")
+                .role(User.Role.EMPLOYEE)
+                .active(true)
+                .build();
+
+        registerRequest = RegisterRequest.builder()
+                .name("Benjamin Valdes")
+                .email("benjamin@innovatech.cl")
+                .password("secret123")
+                .build();
+
+        loginRequest = new LoginRequest("benjamin@innovatech.cl", "secret123");
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // REGISTRO
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("register()")
+    class RegisterTests {
+
+        @Test
+        @DisplayName("✅ Registra usuario nuevo y retorna token JWT")
+        void register_newUser_returnsAuthResponse() {
+            when(userRepository.existsByEmail(anyString())).thenReturn(false);
+            when(passwordEncoder.encode(anyString())).thenReturn("hashed_password");
+            when(userRepository.save(any(User.class))).thenReturn(sampleUser);
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("jwt_token_mock");
+
+            AuthResponse response = authService.register(registerRequest);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getToken()).isEqualTo("jwt_token_mock");
+            assertThat(response.getEmail()).isEqualTo("benjamin@innovatech.cl");
+            assertThat(response.getType()).isEqualTo("Bearer");
+            assertThat(response.getName()).isEqualTo("Benjamin Valdes");
+            verify(userRepository, times(1)).save(any(User.class));
+        }
+
+        @Test
+        @DisplayName("❌ Lanza IllegalArgumentException si email ya existe")
+        void register_duplicateEmail_throwsIllegalArgumentException() {
+            when(userRepository.existsByEmail("benjamin@innovatech.cl")).thenReturn(true);
+
+            assertThatThrownBy(() -> authService.register(registerRequest))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("ya está registrado");
+
+            verify(userRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("✅ Asigna rol EMPLOYEE por defecto si no se especifica rol")
+        void register_noRoleSpecified_assignsEmployeeRoleByDefault() {
+            when(userRepository.existsByEmail(anyString())).thenReturn(false);
+            when(passwordEncoder.encode(anyString())).thenReturn("hashed");
+            when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+                User u = inv.getArgument(0);
+                u.setId(1L);
+                return u;
+            });
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("token");
+
+            RegisterRequest noRoleRequest = RegisterRequest.builder()
+                    .name("Test User")
+                    .email("test@innovatech.cl")
+                    .password("pass123")
+                    .build();
+
+            AuthResponse response = authService.register(noRoleRequest);
+
+            assertThat(response.getRole()).isEqualTo("EMPLOYEE");
+        }
+
+        @Test
+        @DisplayName("✅ Registra usuario con rol ADMIN cuando se especifica")
+        void register_withAdminRole_returnsAdminRole() {
+            User adminUser = User.builder()
+                    .id(2L).name("Admin User")
+                    .email("admin@innovatech.cl")
+                    .password("hashed").role(User.Role.ADMIN).active(true).build();
+
+            RegisterRequest adminRequest = RegisterRequest.builder()
+                    .name("Admin User").email("admin@innovatech.cl")
+                    .password("admin123").role(User.Role.ADMIN).build();
+
+            when(userRepository.existsByEmail(anyString())).thenReturn(false);
+            when(passwordEncoder.encode(anyString())).thenReturn("hashed");
+            when(userRepository.save(any(User.class))).thenReturn(adminUser);
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("admin_token");
+
+            AuthResponse response = authService.register(adminRequest);
+
+            assertThat(response.getRole()).isEqualTo("ADMIN");
+            assertThat(response.getToken()).isEqualTo("admin_token");
+        }
+
+        @Test
+        @DisplayName("✅ La contraseña se almacena hasheada, nunca en texto plano")
+        void register_passwordIsHashedBeforeSave() {
+            when(userRepository.existsByEmail(anyString())).thenReturn(false);
+            when(passwordEncoder.encode("secret123")).thenReturn("BCrypt$hashed$value");
+            when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+                User u = inv.getArgument(0);
+                assertThat(u.getPassword()).isEqualTo("BCrypt$hashed$value");
+                assertThat(u.getPassword()).doesNotContain("secret123");
+                u.setId(1L);
+                return u;
+            });
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("token");
+
+            authService.register(registerRequest);
+
+            verify(passwordEncoder, times(1)).encode("secret123");
+        }
+
+        @Test
+        @DisplayName("✅ El usuario queda activo por defecto tras el registro")
+        void register_newUser_isActiveByDefault() {
+            when(userRepository.existsByEmail(anyString())).thenReturn(false);
+            when(passwordEncoder.encode(anyString())).thenReturn("hashed");
+            when(userRepository.save(any(User.class))).thenAnswer(inv -> {
+                User u = inv.getArgument(0);
+                assertThat(u.isActive()).isTrue();
+                u.setId(1L);
+                return u;
+            });
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("token");
+
+            authService.register(registerRequest);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // LOGIN
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("login()")
+    class LoginTests {
+
+        @Test
+        @DisplayName("✅ Login exitoso con credenciales válidas retorna token")
+        void login_validCredentials_returnsAuthResponse() {
+            when(userRepository.findByEmail("benjamin@innovatech.cl")).thenReturn(Optional.of(sampleUser));
+            when(passwordEncoder.matches("secret123", "hashed_password")).thenReturn(true);
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("jwt_token_mock");
+
+            AuthResponse response = authService.login(loginRequest);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getToken()).isEqualTo("jwt_token_mock");
+            assertThat(response.getEmail()).isEqualTo("benjamin@innovatech.cl");
+            assertThat(response.getType()).isEqualTo("Bearer");
+        }
+
+        @Test
+        @DisplayName("❌ Lanza BadCredentialsException con email inexistente")
+        void login_unknownEmail_throwsBadCredentialsException() {
+            when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> authService.login(loginRequest))
+                    .isInstanceOf(BadCredentialsException.class)
+                    .hasMessageContaining("Credenciales inválidas");
+        }
+
+        @Test
+        @DisplayName("❌ Lanza BadCredentialsException con contraseña incorrecta")
+        void login_wrongPassword_throwsBadCredentialsException() {
+            when(userRepository.findByEmail("benjamin@innovatech.cl")).thenReturn(Optional.of(sampleUser));
+            when(passwordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+            assertThatThrownBy(() -> authService.login(loginRequest))
+                    .isInstanceOf(BadCredentialsException.class)
+                    .hasMessageContaining("Credenciales inválidas");
+        }
+
+        @Test
+        @DisplayName("❌ Lanza BadCredentialsException si usuario está inactivo")
+        void login_inactiveUser_throwsBadCredentialsException() {
+            sampleUser.setActive(false);
+            when(userRepository.findByEmail("benjamin@innovatech.cl")).thenReturn(Optional.of(sampleUser));
+
+            assertThatThrownBy(() -> authService.login(loginRequest))
+                    .isInstanceOf(BadCredentialsException.class)
+                    .hasMessageContaining("inactivo");
+
+            // No debe verificar password si usuario está inactivo
+            verify(passwordEncoder, never()).matches(anyString(), anyString());
+        }
+
+        @Test
+        @DisplayName("✅ El token generado incluye email, rol e ID del usuario")
+        void login_success_tokenGeneratedWithCorrectParameters() {
+            when(userRepository.findByEmail("benjamin@innovatech.cl")).thenReturn(Optional.of(sampleUser));
+            when(passwordEncoder.matches("secret123", "hashed_password")).thenReturn(true);
+            when(jwtService.generateToken(anyString(), anyString(), anyLong())).thenReturn("token");
+
+            authService.login(loginRequest);
+
+            verify(jwtService).generateToken("benjamin@innovatech.cl", "EMPLOYEE", 1L);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // VALIDACIÓN DE TOKEN
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("validateToken()")
+    class ValidateTokenTests {
+
+        @Test
+        @DisplayName("✅ Retorna true para token válido")
+        void validateToken_validToken_returnsTrue() {
+            when(jwtService.isTokenValid("valid_token")).thenReturn(true);
+
+            assertThat(authService.validateToken("valid_token")).isTrue();
+        }
+
+        @Test
+        @DisplayName("✅ Retorna false para token inválido")
+        void validateToken_invalidToken_returnsFalse() {
+            when(jwtService.isTokenValid("bad_token")).thenReturn(false);
+
+            assertThat(authService.validateToken("bad_token")).isFalse();
+        }
+
+        @Test
+        @DisplayName("✅ Retorna false para token nulo")
+        void validateToken_nullToken_returnsFalse() {
+            when(jwtService.isTokenValid(null)).thenReturn(false);
+
+            assertThat(authService.validateToken(null)).isFalse();
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CONSULTA DE USUARIOS
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("getAllUsers() y getUserById()")
+    class UserQueryTests {
+
+        @Test
+        @DisplayName("✅ getAllUsers retorna lista con todos los usuarios")
+        void getAllUsers_returnsUserList() {
+            User secondUser = User.builder().id(2L).name("Ignacio Munoz")
+                    .email("ignacio@innovatech.cl").role(User.Role.MANAGER).active(true).build();
+            when(userRepository.findAll()).thenReturn(List.of(sampleUser, secondUser));
+
+            List<UserResponse> users = authService.getAllUsers();
+
+            assertThat(users).hasSize(2);
+            assertThat(users).extracting(UserResponse::getEmail)
+                    .containsExactlyInAnyOrder("benjamin@innovatech.cl", "ignacio@innovatech.cl");
+        }
+
+        @Test
+        @DisplayName("✅ getAllUsers retorna lista vacía si no hay usuarios")
+        void getAllUsers_emptyRepo_returnsEmptyList() {
+            when(userRepository.findAll()).thenReturn(List.of());
+
+            List<UserResponse> users = authService.getAllUsers();
+
+            assertThat(users).isEmpty();
+        }
+
+        @Test
+        @DisplayName("✅ getUserById retorna usuario existente por ID")
+        void getUserById_existingId_returnsUser() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleUser));
+
+            UserResponse response = authService.getUserById(1L);
+
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("Benjamin Valdes");
+            assertThat(response.getEmail()).isEqualTo("benjamin@innovatech.cl");
+            assertThat(response.getRole()).isEqualTo("EMPLOYEE");
+            assertThat(response.isActive()).isTrue();
+        }
+
+        @Test
+        @DisplayName("❌ getUserById lanza IllegalArgumentException con ID inexistente")
+        void getUserById_nonExistingId_throwsIllegalArgumentException() {
+            when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> authService.getUserById(99L))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("no encontrado")
+                    .hasMessageContaining("99");
+        }
+
+        @Test
+        @DisplayName("✅ UserResponse contiene todos los campos correctos")
+        void getUserById_mapsAllFieldsCorrectly() {
+            when(userRepository.findById(1L)).thenReturn(Optional.of(sampleUser));
+
+            UserResponse response = authService.getUserById(1L);
+
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("Benjamin Valdes");
+            assertThat(response.getEmail()).isEqualTo("benjamin@innovatech.cl");
+            assertThat(response.getRole()).isEqualTo("EMPLOYEE");
+            assertThat(response.isActive()).isTrue();
+        }
+    }
+}
+</file>
+
+<file path="CodigosTest_Backend&Frontend/JwtServiceTest.java">
+package com.innovatech.auth;
+
+import com.innovatech.auth.security.JwtService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import static org.assertj.core.api.Assertions.*;
+
+/**
+ * Pruebas unitarias para JwtService.
+ * Verifica: generación de tokens, validación, expiración, extracción de claims.
+ *
+ * @author Benjamin Valdes, Ignacio Munoz
+ */
+@DisplayName("JwtService — Pruebas Unitarias")
+class JwtServiceTest {
+
+    private JwtService jwtService;
+
+    // Clave de 512 bits para HS512 (mínimo requerido por JJWT 0.12.x)
+    private static final String TEST_SECRET =
+            "innovatech-test-secret-key-min-512-bits-long-for-testing-purposes-only-do-not-use-in-prod";
+    private static final long EXPIRATION_MS = 3_600_000L; // 1 hora
+
+    @BeforeEach
+    void setUp() {
+        jwtService = new JwtService();
+        ReflectionTestUtils.setField(jwtService, "secretKey", TEST_SECRET);
+        ReflectionTestUtils.setField(jwtService, "expirationMs", EXPIRATION_MS);
+    }
+
+    @Nested
+    @DisplayName("generateToken()")
+    class GenerateTokenTests {
+
+        @Test
+        @DisplayName("✅ Genera token no nulo y no vacío")
+        void generateToken_returnsNonEmptyToken() {
+            String token = jwtService.generateToken("user@test.cl", "EMPLOYEE", 1L);
+
+            assertThat(token).isNotNull().isNotBlank();
+        }
+
+        @Test
+        @DisplayName("✅ Token tiene formato JWT (3 partes separadas por punto)")
+        void generateToken_hasJwtFormat() {
+            String token = jwtService.generateToken("user@test.cl", "EMPLOYEE", 1L);
+            String[] parts = token.split("\\.");
+
+            assertThat(parts).hasSize(3);
+        }
+
+        @Test
+        @DisplayName("✅ Tokens distintos para diferentes usuarios")
+        void generateToken_differentUsersGetDifferentTokens() {
+            String token1 = jwtService.generateToken("user1@test.cl", "EMPLOYEE", 1L);
+            String token2 = jwtService.generateToken("user2@test.cl", "ADMIN", 2L);
+
+            assertThat(token1).isNotEqualTo(token2);
+        }
+    }
+
+    @Nested
+    @DisplayName("isTokenValid()")
+    class ValidateTokenTests {
+
+        @Test
+        @DisplayName("✅ Token recién generado es válido")
+        void isTokenValid_freshToken_returnsTrue() {
+            String token = jwtService.generateToken("user@test.cl", "EMPLOYEE", 1L);
+
+            assertThat(jwtService.isTokenValid(token)).isTrue();
+        }
+
+        @Test
+        @DisplayName("❌ Token manipulado es inválido")
+        void isTokenValid_tamperedToken_returnsFalse() {
+            String token = jwtService.generateToken("user@test.cl", "EMPLOYEE", 1L);
+            String tampered = token + "manipulation";
+
+            assertThat(jwtService.isTokenValid(tampered)).isFalse();
+        }
+
+        @Test
+        @DisplayName("❌ Token completamente falso es inválido")
+        void isTokenValid_fakeToken_returnsFalse() {
+            assertThat(jwtService.isTokenValid("not.a.valid.jwt")).isFalse();
+        }
+
+        @Test
+        @DisplayName("❌ Token nulo es inválido")
+        void isTokenValid_nullToken_returnsFalse() {
+            assertThat(jwtService.isTokenValid(null)).isFalse();
+        }
+
+        @Test
+        @DisplayName("❌ Token expirado es inválido")
+        void isTokenValid_expiredToken_returnsFalse() throws Exception {
+            // Configurar expiración de 1 ms para forzar expiración
+            ReflectionTestUtils.setField(jwtService, "expirationMs", 1L);
+            String token = jwtService.generateToken("user@test.cl", "EMPLOYEE", 1L);
+            Thread.sleep(10);
+
+            assertThat(jwtService.isTokenValid(token)).isFalse();
+        }
+    }
+}
+</file>
+
+<file path="CodigosTest_Backend&Frontend/ProjectServiceTest.java">
+package com.innovatech.proyectos;
+
+import com.innovatech.proyectos.dto.ProjectDtos.*;
+import com.innovatech.proyectos.messaging.ProjectEventProducer;
+import com.innovatech.proyectos.model.Project;
+import com.innovatech.proyectos.model.ProjectNote;
+import com.innovatech.proyectos.patterns.factory.ProjectFactory;
+import com.innovatech.proyectos.patterns.factory.ProjectFactoryProvider;
+import com.innovatech.proyectos.repository.IProjectNoteRepository;
+import com.innovatech.proyectos.repository.IProjectRepository;
+import com.innovatech.proyectos.service.ProjectService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
+
+/**
+ * Pruebas unitarias para ProjectService.
+ * Cubre: CRUD de proyectos, asignación de empleados, notas de avance, Factory pattern.
+ * Cobertura objetivo: ≥75% de ProjectService.
+ *
+ * @author Benjamin Valdes, Ignacio Munoz
+ */
+@ExtendWith(MockitoExtension.class)
+@DisplayName("ProjectService — Pruebas Unitarias")
+class ProjectServiceTest {
+
+    @Mock private IProjectRepository projectRepository;
+    @Mock private IProjectNoteRepository noteRepository;
+    @Mock private ProjectFactoryProvider factoryProvider;
+    @Mock private ProjectEventProducer eventProducer;
+    @Mock private ProjectFactory projectFactory;
+
+    @InjectMocks
+    private ProjectService projectService;
+
+    private Project sampleProject;
+    private ProjectNote sampleNote;
+
+    @BeforeEach
+    void setUp() {
+        sampleProject = Project.builder()
+                .id(1L)
+                .name("Portal Cliente Innovatech")
+                .description("Desarrollo del portal web para clientes")
+                .type(Project.ProjectType.SOFTWARE)
+                .status(Project.ProjectStatus.PLANNING)
+                .managerId(10L)
+                .techStack("React, Spring Boot, PostgreSQL")
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        sampleNote = ProjectNote.builder()
+                .id(1L)
+                .projectId(1L)
+                .authorId(5L)
+                .authorName("Empleado Test")
+                .content("Completé el módulo de autenticación")
+                .status(ProjectNote.NoteStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CREACIÓN DE PROYECTOS
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("createProject()")
+    class CreateProjectTests {
+
+        @Test
+        @DisplayName("✅ Crea proyecto SOFTWARE y publica evento Kafka")
+        void createProject_softwareType_savesAndPublishesEvent() {
+            CreateProjectRequest request = CreateProjectRequest.builder()
+                    .name("Portal Cliente")
+                    .type(Project.ProjectType.SOFTWARE)
+                    .managerId(10L)
+                    .build();
+
+            when(factoryProvider.getFactory(Project.ProjectType.SOFTWARE)).thenReturn(projectFactory);
+            when(projectFactory.createProject(request)).thenReturn(sampleProject);
+            when(projectRepository.save(sampleProject)).thenReturn(sampleProject);
+            doNothing().when(eventProducer).publishProjectCreated(anyLong(), anyString(), anyString(), anyString(), anyLong());
+
+            ProjectResponse response = projectService.createProject(request);
+
+            assertThat(response).isNotNull();
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getName()).isEqualTo("Portal Cliente Innovatech");
+            assertThat(response.getType()).isEqualTo("SOFTWARE");
+
+            verify(projectRepository, times(1)).save(sampleProject);
+            verify(eventProducer, times(1)).publishProjectCreated(
+                    eq(1L), anyString(), eq("SOFTWARE"), eq("PLANNING"), eq(10L));
+        }
+
+        @Test
+        @DisplayName("✅ Crea proyecto CONSULTING usando factory correspondiente")
+        void createProject_consultingType_usesConsultingFactory() {
+            Project consultingProject = Project.builder()
+                    .id(2L).name("Consultoría ERP")
+                    .type(Project.ProjectType.CONSULTING)
+                    .status(Project.ProjectStatus.PLANNING)
+                    .managerId(10L).createdAt(LocalDateTime.now()).build();
+
+            CreateProjectRequest request = CreateProjectRequest.builder()
+                    .name("Consultoría ERP")
+                    .type(Project.ProjectType.CONSULTING)
+                    .managerId(10L).build();
+
+            when(factoryProvider.getFactory(Project.ProjectType.CONSULTING)).thenReturn(projectFactory);
+            when(projectFactory.createProject(request)).thenReturn(consultingProject);
+            when(projectRepository.save(consultingProject)).thenReturn(consultingProject);
+            doNothing().when(eventProducer).publishProjectCreated(anyLong(), anyString(), anyString(), anyString(), anyLong());
+
+            ProjectResponse response = projectService.createProject(request);
+
+            assertThat(response.getType()).isEqualTo("CONSULTING");
+            verify(factoryProvider).getFactory(Project.ProjectType.CONSULTING);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ACTUALIZACIÓN DE PROYECTOS
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("updateProject()")
+    class UpdateProjectTests {
+
+        @Test
+        @DisplayName("✅ Actualiza nombre y descripción de proyecto existente")
+        void updateProject_existingId_updatesAndReturnsResponse() {
+            UpdateProjectRequest request = UpdateProjectRequest.builder()
+                    .name("Portal Cliente v2")
+                    .description("Nueva descripción actualizada")
+                    .build();
+
+            Project updatedProject = Project.builder()
+                    .id(1L).name("Portal Cliente v2")
+                    .description("Nueva descripción actualizada")
+                    .type(Project.ProjectType.SOFTWARE)
+                    .status(Project.ProjectStatus.PLANNING)
+                    .managerId(10L).createdAt(LocalDateTime.now()).build();
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(projectRepository.save(any(Project.class))).thenReturn(updatedProject);
+
+            ProjectResponse response = projectService.updateProject(1L, request);
+
+            assertThat(response.getName()).isEqualTo("Portal Cliente v2");
+            assertThat(response.getDescription()).isEqualTo("Nueva descripción actualizada");
+        }
+
+        @Test
+        @DisplayName("❌ Lanza IllegalArgumentException si proyecto no existe")
+        void updateProject_nonExistingId_throwsIllegalArgumentException() {
+            when(projectRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> projectService.updateProject(99L,
+                    UpdateProjectRequest.builder().name("x").build()))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("no encontrado");
+        }
+
+        @Test
+        @DisplayName("✅ Actualiza solo el estado del proyecto")
+        void updateStatus_existingProject_updatesStatusOnly() {
+            UpdateStatusRequest request = new UpdateStatusRequest(Project.ProjectStatus.IN_PROGRESS);
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(projectRepository.save(any())).thenAnswer(inv -> {
+                Project p = inv.getArgument(0);
+                assertThat(p.getStatus()).isEqualTo(Project.ProjectStatus.IN_PROGRESS);
+                return p;
+            });
+
+            projectService.updateStatus(1L, request);
+
+            verify(projectRepository).save(any(Project.class));
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ASIGNACIÓN DE EMPLEADOS
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("assignEmployee() / unassignEmployee()")
+    class AssignEmployeeTests {
+
+        @Test
+        @DisplayName("✅ Asigna empleado a proyecto existente")
+        void assignEmployee_existingProject_setsEmployeeFields() {
+            AssignEmployeeRequest request = AssignEmployeeRequest.builder()
+                    .employeeId(5L)
+                    .employeeName("Juan Pérez")
+                    .build();
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(projectRepository.save(any())).thenAnswer(inv -> {
+                Project p = inv.getArgument(0);
+                assertThat(p.getAssignedUserId()).isEqualTo(5L);
+                assertThat(p.getAssignedUserName()).isEqualTo("Juan Pérez");
+                return p;
+            });
+
+            projectService.assignEmployee(1L, request);
+
+            verify(projectRepository).save(any(Project.class));
+        }
+
+        @Test
+        @DisplayName("✅ Desasigna empleado de proyecto — campos quedan en null")
+        void unassignEmployee_existingProject_clearsEmployeeFields() {
+            sampleProject.setAssignedUserId(5L);
+            sampleProject.setAssignedUserName("Juan Pérez");
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(projectRepository.save(any())).thenAnswer(inv -> {
+                Project p = inv.getArgument(0);
+                assertThat(p.getAssignedUserId()).isNull();
+                assertThat(p.getAssignedUserName()).isNull();
+                return p;
+            });
+
+            projectService.unassignEmployee(1L);
+
+            verify(projectRepository).save(any(Project.class));
+        }
+
+        @Test
+        @DisplayName("❌ Asignar a proyecto inexistente lanza excepción")
+        void assignEmployee_nonExistingProject_throwsException() {
+            when(projectRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> projectService.assignEmployee(99L,
+                    AssignEmployeeRequest.builder().employeeId(1L).build()))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // ELIMINACIÓN
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("deleteProject()")
+    class DeleteProjectTests {
+
+        @Test
+        @DisplayName("✅ Elimina proyecto existente sin errores")
+        void deleteProject_existingId_deletesSuccessfully() {
+            when(projectRepository.existsById(1L)).thenReturn(true);
+            doNothing().when(projectRepository).deleteById(1L);
+
+            assertThatCode(() -> projectService.deleteProject(1L)).doesNotThrowAnyException();
+
+            verify(projectRepository).deleteById(1L);
+        }
+
+        @Test
+        @DisplayName("❌ Lanza excepción al intentar eliminar proyecto inexistente")
+        void deleteProject_nonExistingId_throwsIllegalArgumentException() {
+            when(projectRepository.existsById(99L)).thenReturn(false);
+
+            assertThatThrownBy(() -> projectService.deleteProject(99L))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("no encontrado");
+
+            verify(projectRepository, never()).deleteById(any());
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // CONSULTAS
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Consultas de proyectos")
+    class QueryTests {
+
+        @Test
+        @DisplayName("✅ getAllProjects retorna lista completa")
+        void getAllProjects_returnsAllProjects() {
+            when(projectRepository.findAll()).thenReturn(List.of(sampleProject));
+
+            List<ProjectResponse> result = projectService.getAllProjects();
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getName()).isEqualTo("Portal Cliente Innovatech");
+        }
+
+        @Test
+        @DisplayName("✅ getProjectById retorna proyecto correcto")
+        void getProjectById_existingId_returnsProject() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+
+            ProjectResponse response = projectService.getProjectById(1L);
+
+            assertThat(response.getId()).isEqualTo(1L);
+            assertThat(response.getManagerId()).isEqualTo(10L);
+        }
+
+        @Test
+        @DisplayName("✅ getProjectsByStatus filtra por estado correctamente")
+        void getProjectsByStatus_planning_returnsFilteredProjects() {
+            when(projectRepository.findByStatus(Project.ProjectStatus.PLANNING))
+                    .thenReturn(List.of(sampleProject));
+
+            List<ProjectResponse> result = projectService.getProjectsByStatus(Project.ProjectStatus.PLANNING);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getStatus()).isEqualTo("PLANNING");
+        }
+
+        @Test
+        @DisplayName("✅ getProjectsByAssignedUser filtra en memoria por userId")
+        void getProjectsByAssignedUser_returnsOnlyAssignedProjects() {
+            sampleProject.setAssignedUserId(5L);
+            Project otherProject = Project.builder()
+                    .id(2L).name("Otro").type(Project.ProjectType.SOFTWARE)
+                    .status(Project.ProjectStatus.PLANNING).assignedUserId(99L)
+                    .createdAt(LocalDateTime.now()).build();
+
+            when(projectRepository.findAll()).thenReturn(List.of(sampleProject, otherProject));
+
+            List<ProjectResponse> result = projectService.getProjectsByAssignedUser(5L);
+
+            assertThat(result).hasSize(1);
+            assertThat(result.get(0).getId()).isEqualTo(1L);
+        }
+
+        @Test
+        @DisplayName("✅ getTotalCount retorna el conteo correcto del repositorio")
+        void getTotalCount_returnsTotalFromRepository() {
+            when(projectRepository.count()).thenReturn(7L);
+
+            assertThat(projectService.getTotalCount()).isEqualTo(7L);
+        }
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // NOTAS DE AVANCE
+    // ═══════════════════════════════════════════════════════════════
+
+    @Nested
+    @DisplayName("Notas de avance")
+    class NoteTests {
+
+        @Test
+        @DisplayName("✅ addNote crea nota PENDING para proyecto existente")
+        void addNote_existingProject_createsNoteAsPending() {
+            CreateNoteRequest request = new CreateNoteRequest("Completé el módulo de login");
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(noteRepository.save(any(ProjectNote.class))).thenReturn(sampleNote);
+
+            NoteResponse response = projectService.addNote(1L, request, 5L, "Empleado Test");
+
+            assertThat(response).isNotNull();
+            assertThat(response.getStatus()).isEqualTo("PENDING");
+            assertThat(response.getAuthorId()).isEqualTo(5L);
+            verify(noteRepository).save(any(ProjectNote.class));
+        }
+
+        @Test
+        @DisplayName("❌ addNote falla si proyecto no existe")
+        void addNote_nonExistingProject_throwsException() {
+            when(projectRepository.findById(99L)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> projectService.addNote(99L,
+                    new CreateNoteRequest("contenido"), 1L, "User"))
+                    .isInstanceOf(IllegalArgumentException.class);
+        }
+
+        @Test
+        @DisplayName("✅ getNotesByProject retorna notas del proyecto")
+        void getNotesByProject_existingProject_returnsNotes() {
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(noteRepository.findByProjectId(1L)).thenReturn(List.of(sampleNote));
+
+            List<NoteResponse> notes = projectService.getNotesByProject(1L);
+
+            assertThat(notes).hasSize(1);
+            assertThat(notes.get(0).getContent()).isEqualTo("Completé el módulo de autenticación");
+        }
+
+        @Test
+        @DisplayName("✅ reviewNote aprueba nota PENDING y guarda reviewer")
+        void reviewNote_pendingNote_approvesAndSetsReviewer() {
+            ReviewNoteRequest request = ReviewNoteRequest.builder()
+                    .status(ProjectNote.NoteStatus.APPROVED)
+                    .reviewComment("Excelente trabajo")
+                    .build();
+
+            ProjectNote reviewedNote = ProjectNote.builder()
+                    .id(1L).projectId(1L).authorId(5L).content("contenido")
+                    .status(ProjectNote.NoteStatus.APPROVED)
+                    .reviewerId(10L).reviewerName("Manager Test")
+                    .reviewComment("Excelente trabajo").createdAt(LocalDateTime.now()).build();
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(noteRepository.findById(1L)).thenReturn(Optional.of(sampleNote));
+            when(noteRepository.save(any(ProjectNote.class))).thenReturn(reviewedNote);
+
+            NoteResponse response = projectService.reviewNote(1L, 1L, request, 10L, "Manager Test");
+
+            assertThat(response.getStatus()).isEqualTo("APPROVED");
+            assertThat(response.getReviewComment()).isEqualTo("Excelente trabajo");
+        }
+
+        @Test
+        @DisplayName("❌ reviewNote falla si nota ya fue revisada (no PENDING)")
+        void reviewNote_alreadyReviewedNote_throwsException() {
+            sampleNote.setStatus(ProjectNote.NoteStatus.APPROVED);
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(noteRepository.findById(1L)).thenReturn(Optional.of(sampleNote));
+
+            assertThatThrownBy(() -> projectService.reviewNote(1L, 1L,
+                    ReviewNoteRequest.builder().status(ProjectNote.NoteStatus.REJECTED).build(),
+                    10L, "Manager"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("PENDING");
+        }
+
+        @Test
+        @DisplayName("❌ reviewNote falla si nota no pertenece al proyecto")
+        void reviewNote_noteFromDifferentProject_throwsException() {
+            sampleNote.setProjectId(99L); // nota de otro proyecto
+
+            when(projectRepository.findById(1L)).thenReturn(Optional.of(sampleProject));
+            when(noteRepository.findById(1L)).thenReturn(Optional.of(sampleNote));
+
+            assertThatThrownBy(() -> projectService.reviewNote(1L, 1L,
+                    ReviewNoteRequest.builder().status(ProjectNote.NoteStatus.APPROVED).build(),
+                    10L, "Manager"))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("no pertenece");
+        }
+    }
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/.gitignore">
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/eslint.config.js">
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+  },
+])
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/index.html">
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Innovatech Solutions — Gestión de Proyectos</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/package.json">
+{
+  "name": "innovatech-frontend-valdes-munoz",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.15.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-router-dom": "^7.6.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^10.2.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.5.0",
+    "vite": "^8.0.10"
+  }
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/README.md">
+# 🖥️ innovatech-frontend-valdes-munoz
+
+> **Frontend** de la plataforma Innovatech Solutions — Evaluación Parcial 2  
+> Asignatura: DSY1106 – Desarrollo Fullstack III | Instituto DuocUC | 2026  
+> Estudiantes: **Benjamín Valdés** · **Ignacio Muñoz**
+
+---
+
+## 📑 Tabla de Contenidos
+
+1. [Descripción del Proyecto](#descripción-del-proyecto)
+2. [Tecnologías Utilizadas](#tecnologías-utilizadas)
+3. [Estructura del Proyecto](#estructura-del-proyecto)
+4. [Requisitos Previos](#requisitos-previos)
+5. [Instalación Paso a Paso](#instalación-paso-a-paso)
+6. [Ejecución en Desarrollo](#ejecución-en-desarrollo)
+7. [Variables de Entorno](#variables-de-entorno)
+8. [Funcionalidades Implementadas](#funcionalidades-implementadas)
+9. [Rutas de la Aplicación](#rutas-de-la-aplicación)
+10. [Componentes Principales](#componentes-principales)
+11. [Conexión con el Backend (BFF)](#conexión-con-el-backend-bff)
+12. [Construcción para Producción](#construcción-para-producción)
+13. [Resolución de Problemas Comunes](#resolución-de-problemas-comunes)
+
+---
+
+## 📌 Descripción del Proyecto
+
+Este repositorio contiene el componente **frontend** de la plataforma Innovatech Solutions, desarrollado con **React 18** y **Vite**. Implementa las vistas de autenticación (registro e inicio de sesión) y el dashboard principal del sistema, consumiendo los servicios expuestos por el BFF (Backend For Frontend).
+
+### Arquitectura en Contexto
+
+```
+[Browser / Usuario]
+        ↓
+[Frontend React - :5173]
+        ↓  (fetch HTTP)
+[BFF Node.js - :3001]
+        ↓  (HTTP / JWT)
+[Kong API Gateway - :8000]
+        ↓
+[Microservicios: ms-auth (:8081) | ms-proyectos (:8082)]
+```
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| React | 18.x | Librería de UI basada en componentes |
+| Vite | 5.x | Bundler y servidor de desarrollo |
+| React Router DOM | 6.x | Enrutamiento SPA |
+| Context API | (nativo) | Gestión de estado de autenticación |
+| CSS Modules | (nativo) | Estilos encapsulados por componente |
+| Node.js | ≥ 18 | Entorno de ejecución |
+| NPM | ≥ 9 | Gestor de paquetes |
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+innovatech-frontend-valdes-munoz/
+├── public/
+│   ├── favicon.svg          # Ícono de la aplicación
+│   └── icons.svg            # Íconos del sistema
+├── src/
+│   ├── assets/
+│   │   ├── hero.png         # Imagen principal del hero
+│   │   ├── react.svg        # Logo de React
+│   │   └── vite.svg         # Logo de Vite
+│   ├── components/
+│   │   └── PrivateRoute.jsx # HOC protector de rutas autenticadas
+│   ├── context/
+│   │   └── AuthContext.jsx  # Contexto global de autenticación
+│   ├── pages/
+│   │   ├── LoginPage.jsx    # Página de inicio de sesión
+│   │   ├── RegisterPage.jsx # Página de registro de usuario
+│   │   └── DashboardPage.jsx# Dashboard principal (ruta protegida)
+│   ├── services/
+│   │   ├── authService.js   # Llamadas HTTP a endpoints de auth (/api/auth)
+│   │   └── projectService.js# Llamadas HTTP a endpoints de proyectos (/api/projects)
+│   ├── App.jsx              # Componente raíz con definición de rutas
+│   ├── App.css              # Estilos globales
+│   ├── index.css            # Reset CSS y variables globales
+│   └── main.jsx             # Punto de entrada de React
+├── index.html               # HTML raíz (Vite)
+├── vite.config.js           # Configuración de Vite (proxy al BFF)
+├── package.json             # Dependencias y scripts NPM
+├── eslint.config.js         # Reglas de linting
+└── README.md                # Este archivo
+```
+
+---
+
+## ✅ Requisitos Previos
+
+Antes de instalar el frontend, asegúrate de tener instalado:
+
+1. **Node.js ≥ 18** — [Descargar en nodejs.org](https://nodejs.org)
+2. **NPM ≥ 9** — Se instala automáticamente con Node.js
+3. **BFF corriendo** — El BFF debe estar activo en `http://localhost:3001`
+4. **Microservicios corriendo** — ms-auth y ms-proyectos deben estar activos
+
+Verificar instalaciones:
+```bash
+node --version    # Debe mostrar v18.x o superior
+npm --version     # Debe mostrar 9.x o superior
+```
+
+---
+
+## 📥 Instalación Paso a Paso
+
+### Paso 1: Clonar el repositorio
+
+```bash
+git clone https://github.com/TU_USUARIO/innovatech-frontend-valdes-munoz.git
+cd innovatech-frontend-valdes-munoz
+```
+
+### Paso 2: Instalar dependencias
+
+```bash
+npm install
+```
+
+Este comando descarga todas las dependencias listadas en `package.json` al directorio `node_modules/`. Puede tomar 1-3 minutos dependiendo de la conexión a internet.
+
+**Salida esperada:**
+```
+added 312 packages, and audited 313 packages in 45s
+```
+
+---
+
+## ▶️ Ejecución en Desarrollo
+
+```bash
+npm run dev
+```
+
+**Salida esperada en consola:**
+```
+  VITE v5.x.x  ready in 500 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.x.x:5173/
+  ➜  press h + enter to show help
+```
+
+Abrir en el navegador: **http://localhost:5173**
+
+> ⚠️ **Importante:** El frontend requiere que el BFF esté corriendo en `http://localhost:3001`. Si el BFF no está activo, las llamadas a `/api/*` retornarán errores de conexión.
+
+---
+
+## 🔧 Variables de Entorno
+
+El frontend **no requiere archivo `.env`** para funcionar en desarrollo. La URL del BFF está configurada en `vite.config.js` mediante un proxy:
+
+```javascript
+// vite.config.js
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      }
+    }
+  }
+})
+```
+
+Esto redirige automáticamente todas las peticiones a `/api/*` hacia `http://localhost:3001/api/*`, eliminando problemas de CORS en desarrollo.
+
+---
+
+## 🚀 Funcionalidades Implementadas
+
+### Autenticación
+- ✅ **Registro de usuario** — Formulario con validación (username, email, password, rol)
+- ✅ **Inicio de sesión** — Formulario con manejo de errores (credenciales inválidas)
+- ✅ **Gestión de token JWT** — Almacenamiento en `localStorage`, incluido en headers HTTP
+- ✅ **Logout** — Limpieza del token y redirección al login
+- ✅ **Rutas protegidas** — Redirección automática al login si no hay sesión activa
+
+### Dashboard
+- ✅ **Vista de proyectos** — Listado de proyectos del usuario autenticado
+- ✅ **Perfil de usuario** — Visualización del nombre y rol del usuario logueado
+- ✅ **Indicador de estado del sistema** — Muestra si el backend está disponible
+
+---
+
+## 🗺️ Rutas de la Aplicación
+
+| Ruta | Componente | Acceso | Descripción |
+|------|-----------|--------|-------------|
+| `/` | Redirect | Público | Redirige a `/login` o `/dashboard` según autenticación |
+| `/login` | LoginPage | Público | Formulario de inicio de sesión |
+| `/register` | RegisterPage | Público | Formulario de registro de nuevo usuario |
+| `/dashboard` | DashboardPage | Privado | Vista principal del sistema (requiere JWT) |
+
+Las rutas privadas están protegidas por el componente `PrivateRoute`, que verifica la existencia del token JWT en el contexto de autenticación. Si no hay token, redirige automáticamente a `/login`.
+
+---
+
+## 🧩 Componentes Principales
+
+### AuthContext (`src/context/AuthContext.jsx`)
+
+Contexto React que gestiona el estado global de autenticación:
+
+```jsx
+// Estado disponible en toda la aplicación
+const { user, token, login, logout, isAuthenticated } = useAuth();
+```
+
+- `user` — Objeto con datos del usuario (username, email, rol)
+- `token` — JWT almacenado en localStorage
+- `login(credentials)` — Llama a authService y actualiza el estado
+- `logout()` — Limpia el token y redirige al login
+- `isAuthenticated` — Boolean que indica si hay sesión activa
+
+### PrivateRoute (`src/components/PrivateRoute.jsx`)
+
+Higher-Order Component que protege rutas autenticadas:
+
+```jsx
+<Route path="/dashboard" element={
+  <PrivateRoute>
+    <DashboardPage />
+  </PrivateRoute>
+} />
+```
+
+### authService (`src/services/authService.js`)
+
+Capa de servicio para llamadas HTTP a endpoints de autenticación:
+
+| Función | Endpoint BFF | Método | Descripción |
+|---------|-------------|--------|-------------|
+| `register(data)` | `/api/auth/register` | POST | Registra nuevo usuario |
+| `login(credentials)` | `/api/auth/login` | POST | Autentica usuario y retorna JWT |
+| `getProfile()` | `/api/auth/profile` | GET | Obtiene datos del usuario autenticado |
+
+---
+
+## 🔌 Conexión con el Backend (BFF)
+
+El frontend se comunica **exclusivamente con el BFF** (nunca directamente con los microservicios). El BFF actúa como intermediario, valida el JWT y enruta las peticiones.
+
+**Flujo de autenticación:**
+
+```
+1. Usuario llena formulario de login
+2. LoginPage → authService.login(credentials)
+3. authService → POST /api/auth/login (al BFF via proxy Vite)
+4. BFF → POST http://ms-auth:8081/auth/login
+5. ms-auth valida credenciales → retorna JWT
+6. BFF → retorna JWT al frontend
+7. AuthContext almacena JWT en localStorage
+8. React Router redirige a /dashboard
+```
+
+**Headers enviados en peticiones autenticadas:**
+```
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+```
+
+---
+
+## 🏗️ Construcción para Producción
+
+```bash
+npm run build
+```
+
+Genera el directorio `dist/` con los archivos estáticos optimizados:
+
+```
+dist/
+├── index.html
+├── assets/
+│   ├── index-[hash].js   (bundle JS)
+│   └── index-[hash].css  (bundle CSS)
+└── ...
+```
+
+Para previsualizar la build antes de desplegar:
+```bash
+npm run preview
+# Disponible en http://localhost:4173
+```
+
+---
+
+## 🩺 Resolución de Problemas Comunes
+
+### ❌ Error: "Cannot connect to localhost:3001"
+
+**Causa:** El BFF no está corriendo.  
+**Solución:** Iniciar el BFF con `npm run dev` en el directorio `innovatech-bff-valdes-munoz/`.
+
+### ❌ Error: "401 Unauthorized" al acceder al dashboard
+
+**Causa:** El token JWT expiró o es inválido.  
+**Solución:** Hacer logout y volver a iniciar sesión.
+
+### ❌ Error: "node_modules not found" al ejecutar `npm run dev`
+
+**Causa:** Las dependencias no están instaladas.  
+**Solución:** Ejecutar `npm install` en el directorio raíz del proyecto.
+
+### ❌ La página muestra pantalla en blanco
+
+**Causa:** Error de JavaScript en consola del navegador.  
+**Solución:** Abrir DevTools (F12) → pestaña Console → revisar el error específico.
+
+### ❌ Error de CORS en peticiones al BFF
+
+**Causa:** No se está usando el proxy de Vite (se está accediendo directamente al BFF desde otra URL).  
+**Solución:** Acceder siempre a través de `http://localhost:5173`, no directamente a `http://localhost:3001`.
+
+---
+
+## 👥 Contribuidores
+
+| Estudiante | GitHub | Rol Principal |
+|-----------|--------|---------------|
+| Benjamín Valdés | @benjaminvaldes | BFF + ms-auth |
+| Ignacio Muñoz | @ignacionunoz | Frontend + ms-proyectos |
+
+---
+
+**Instituto DuocUC 2026 — DSY1106 Desarrollo Fullstack III —*
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/App.css">
+/* No utilizado - estilos en index.css */
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/App.jsx">
+import { Routes, Route, Navigate } from 'react-router-dom'
+import LoginPage from './pages/LoginPage.jsx'
+import RegisterPage from './pages/RegisterPage.jsx'
+import DashboardPage from './pages/DashboardPage.jsx'
+import PrivateRoute from './components/PrivateRoute.jsx'
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/dashboard" element={
+        <PrivateRoute>
+          <DashboardPage />
+        </PrivateRoute>
+      } />
+    </Routes>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/components/PrivateRoute.jsx">
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+
+/** Guarda de ruta: redirige a /login si no hay sesión activa. */
+export default function PrivateRoute({ children }) {
+  const { isAuthenticated, isLoading } = useAuth()
+  if (isLoading) return null
+  return isAuthenticated ? children : <Navigate to="/login" replace />
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/context/AuthContext.jsx">
+/**
+ * AuthContext — Patrón Observer con React Context + useReducer.
+ * Cualquier componente puede "observar" el estado de autenticación.
+ */
+import { createContext, useContext, useReducer, useEffect } from 'react'
+
+const AuthContext = createContext(null)
+
+const initialState = {
+  user: null,
+  token: null,
+  isAuthenticated: false,
+  isLoading: true,
+}
+
+function authReducer(state, action) {
+  switch (action.type) {
+    case 'LOGIN':
+    case 'RESTORE':
+      return { ...state, user: action.payload.user, token: action.payload.token, isAuthenticated: true, isLoading: false }
+    case 'LOGOUT':
+      return { ...initialState, isLoading: false }
+    case 'LOADED':
+      return { ...state, isLoading: false }
+    default:
+      return state
+  }
+}
+
+export function AuthProvider({ children }) {
+  const [state, dispatch] = useReducer(authReducer, initialState)
+
+  useEffect(() => {
+    const token = localStorage.getItem('innovatech_token')
+    const userStr = localStorage.getItem('innovatech_user')
+    if (token && userStr) {
+      try {
+        dispatch({ type: 'RESTORE', payload: { user: JSON.parse(userStr), token } })
+      } catch {
+        dispatch({ type: 'LOADED' })
+      }
+    } else {
+      dispatch({ type: 'LOADED' })
+    }
+  }, [])
+
+  const login = (user, token) => {
+    localStorage.setItem('innovatech_token', token)
+    localStorage.setItem('innovatech_user', JSON.stringify(user))
+    dispatch({ type: 'LOGIN', payload: { user, token } })
+  }
+
+  const logout = () => {
+    localStorage.removeItem('innovatech_token')
+    localStorage.removeItem('innovatech_user')
+    dispatch({ type: 'LOGOUT' })
+  }
+
+  return (
+    <AuthContext.Provider value={{ ...state, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export function useAuth() {
+  const ctx = useContext(AuthContext)
+  if (!ctx) throw new Error('useAuth debe usarse dentro de AuthProvider')
+  return ctx
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/index.css">
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f0f4f8;
+  color: #1a2a3a;
+  min-height: 100vh;
+}
+:root {
+  --primary: #0d7c8f;
+  --primary-dark: #0a6070;
+  --navy: #1c3554;
+  --danger: #c62828;
+  --success: #1e8449;
+  --white: #ffffff;
+  --gray: #f4f8fb;
+  --border: #cfd8dc;
+  --shadow: 0 2px 8px rgba(0,0,0,0.10);
+  --radius: 8px;
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/main.jsx">
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext.jsx'
+import App from './App.jsx'
+import './index.css'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <BrowserRouter>
+      <AuthProvider>
+        <App />
+      </AuthProvider>
+    </BrowserRouter>
+  </StrictMode>
+)
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/DashboardPage.jsx">
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
+import { T } from './dashboard/tokens.js'
+import ProjectsView      from './dashboard/ProjectsView.jsx'
+import ResourcesView     from './dashboard/ResourcesView.jsx'
+import KpiView           from './dashboard/KpiView.jsx'
+import NotificationsView from './dashboard/NotificationsView.jsx'
+
+const NAV_ITEMS = [
+  {
+    id:'proyectos', label:'Proyectos', roles:['ADMIN','MANAGER','EMPLOYEE'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M2 6a2 2 0 012-2h5l2 2h9a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+    </svg>),
+  },
+  {
+    id:'recursos', label:'Recursos Humanos', roles:['ADMIN','MANAGER'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H2v-2a4 4 0 013-3.87m12-5.13a4 4 0 11-8 0 4 4 0 018 0zM7 8a4 4 0 110 8 4 4 0 010-8z"/>
+    </svg>),
+  },
+  {
+    id:'kpis', label:'Métricas / KPIs', roles:['ADMIN','MANAGER'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/>
+    </svg>),
+  },
+  {
+    id:'notificaciones', label:'Notificaciones', roles:['ADMIN','MANAGER','EMPLOYEE'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.993M9 17H4l1.405-1.405A2.032 2.032 0 006 14.158V11a6 6 0 016-6"/>
+      <path d="M13 21a1 1 0 01-2 0"/>
+    </svg>),
+  },
+]
+
+export default function DashboardPage() {
+  const { user, logout } = useAuth()
+  const navigate          = useNavigate()
+  const [activeView, setActiveView] = useState('proyectos')
+
+  useEffect(() => {
+    if (!user) navigate('/login', { replace:true })
+  }, [user, navigate])
+
+  if (!user) return null
+
+  const role        = user.role || 'EMPLOYEE'
+  const roleConfig  = T.color[`role${role[0]}${role.slice(1).toLowerCase()}`] || T.color.roleEmployee
+  const roleLabel   = { ADMIN:'Administrador', MANAGER:'Manager', EMPLOYEE:'Empleado' }[role] || role
+  const visibleItems= NAV_ITEMS.filter(it => it.roles.includes(role))
+  const currentItem = visibleItems.find(it => it.id === activeView) || visibleItems[0]
+
+  const handleLogout = () => { logout(); navigate('/login', { replace:true }) }
+
+  const sidebarItemStyle = (id) => ({
+    display:'flex', alignItems:'center', gap:12,
+    padding:'10px 16px', margin:'1px 10px',
+    borderRadius:T.radius.sm,
+    cursor:'pointer', fontSize:14, fontWeight:500,
+    border:'none', width:'calc(100% - 20px)', textAlign:'left',
+    transition:'background 0.12s, color 0.12s',
+    ...(currentItem.id === id ? {
+      background:T.color.sidebarActiveBg,
+      color:T.color.sidebarActive,
+      boxShadow:`inset 3px 0 0 ${T.color.sidebarActiveBar}`,
+    } : {
+      background:'transparent',
+      color:T.color.sidebarText,
+    }),
+  })
+
+  const renderView = () => {
+    switch (currentItem.id) {
+      case 'proyectos':      return <ProjectsView      user={user}/>
+      case 'recursos':       return <ResourcesView     user={user}/>
+      case 'kpis':           return <KpiView/>
+      case 'notificaciones': return <NotificationsView/>
+      default:               return <ProjectsView      user={user}/>
+    }
+  }
+
+  return (
+    <>
+      <style>{`
+        @keyframes innovatech-spin { to { transform: rotate(360deg); } }
+        * { box-sizing: border-box; }
+        body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+        button:hover { opacity:.88; }
+      `}</style>
+
+      <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:T.color.bg }}>
+
+        {/* SIDEBAR */}
+        <aside style={{
+          width:T.sidebar.width, minWidth:T.sidebar.width,
+          background:T.color.sidebarBg,
+          display:'flex', flexDirection:'column',
+          height:'100vh', position:'sticky', top:0, overflowY:'auto',
+        }}>
+          {/* Logo */}
+          <div style={{ padding:'22px 20px 18px', borderBottom:`1px solid ${T.color.sidebarBorder}` }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <div style={{
+                width:34, height:34, borderRadius:T.radius.sm,
+                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
+                display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                  <polyline points="2 17 12 22 22 17"/>
+                  <polyline points="2 12 12 17 22 12"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:'#e2e8f0', lineHeight:1.2 }}>Innovatech</div>
+                <div style={{ fontSize:11, color:T.color.sidebarText, lineHeight:1.2 }}>Solutions</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Nav */}
+          <nav style={{ flex:1, padding:'12px 0' }}>
+            <div style={{ padding:'6px 20px 8px', fontSize:10, fontWeight:700,
+                          color:'#334155', textTransform:'uppercase', letterSpacing:'0.1em' }}>
+              Principal
+            </div>
+            {visibleItems.map(item => (
+              <button key={item.id} onClick={() => setActiveView(item.id)} style={sidebarItemStyle(item.id)}>
+                <span style={{ flexShrink:0, display:'flex' }}>{item.icon}</span>
+                <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* User card */}
+          <div style={{ padding:'16px 18px', borderTop:`1px solid ${T.color.sidebarBorder}`, marginTop:'auto' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
+              <div style={{
+                width:36, height:36, borderRadius:'50%',
+                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:15, fontWeight:700, color:'#fff', flexShrink:0,
+              }}>
+                {user.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              <div style={{ overflow:'hidden' }}>
+                <div style={{ fontSize:13, fontWeight:600, color:'#cbd5e1',
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {user.name}
+                </div>
+                <div style={{ fontSize:11, color:T.color.sidebarText,
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {user.email}
+                </div>
+              </div>
+            </div>
+            <button onClick={handleLogout} style={{
+              width:'100%', background:'rgba(239,68,68,0.1)', color:'#f87171',
+              border:'1px solid rgba(239,68,68,0.2)', borderRadius:T.radius.sm,
+              padding:'7px 12px', fontSize:13, fontWeight:600, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+            }}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+              </svg>
+              Cerrar sesión
+            </button>
+          </div>
+        </aside>
+
+        {/* MAIN */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+          {/* Header */}
+          <header style={{
+            height:T.header.height, background:T.color.surface,
+            borderBottom:`1px solid ${T.color.border}`,
+            display:'flex', alignItems:'center', justifyContent:'space-between',
+            padding:'0 32px', flexShrink:0, boxShadow:'0 1px 0 rgba(0,0,0,0.06)',
+          }}>
+            <div>
+              <h2 style={{ margin:0, fontSize:16, fontWeight:700, color:T.color.textPrimary }}>{currentItem.label}</h2>
+              <p style={{ margin:0, fontSize:12, color:T.color.textMuted }}>Innovatech Solutions — Plataforma Integrada</p>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+              <span style={{
+                padding:'4px 12px', borderRadius:99, fontSize:12, fontWeight:600,
+                background:roleConfig.bg, color:roleConfig.color, border:`1px solid ${roleConfig.border}`,
+              }}>
+                {roleLabel}
+              </span>
+              <div style={{
+                width:36, height:36, borderRadius:'50%',
+                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:15, fontWeight:700, color:'#fff',
+              }}>
+                {user.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            </div>
+          </header>
+
+          {/* Content */}
+          <main style={{ flex:1, overflowY:'auto', padding:32 }}>
+            {renderView()}
+          </main>
+        </div>
+      </div>
+    </>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/LoginPage.jsx">
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { login } from '../services/authService.js'
+import { useAuth } from '../context/AuthContext.jsx'
+
+// ── SVG Icons ────────────────────────────────────────────────────────────────
+const ArrowRight = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12" />
+    <polyline points="12 5 19 12 12 19" />
+  </svg>
+)
+
+const SpinnerIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+)
+
+// ── Tokens ──────────────────────────────────────────────────────────────────
+const T = {
+  canvas:    '#FBFBFA',
+  surface:   '#FFFFFF',
+  border:    '#EAEAEA',
+  text:      '#111111',
+  muted:     '#787774',
+  btnBg:     '#111111',
+  btnText:   '#FFFFFF',
+  btnHover:  '#333333',
+  errBg:     '#FDEBEC',
+  errText:   '#9F2F2D',
+  errBorder: 'rgba(159,47,45,0.2)',
+  font:      "'Geist Sans','Helvetica Neue',-apple-system,BlinkMacSystemFont,sans-serif",
+}
+
+export default function LoginPage() {
+  const navigate = useNavigate()
+  const { login: authLogin } = useAuth()
+  const [form, setForm] = useState({ email: '', password: '' })
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [btnHover, setBtnHover] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 30)
+    return () => clearTimeout(t)
+  }, [])
+
+  const handleChange = (e) => {
+    setForm(p => ({ ...p, [e.target.name]: e.target.value }))
+    setError(null)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.email || !form.password) { setError('Completa todos los campos.'); return }
+    setLoading(true)
+    try {
+      const res = await login(form)
+      authLogin({ id: res.userId, name: res.name, email: res.email, role: res.role }, res.token)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.status === 401 ? 'Email o contraseña incorrectos.' : (err.message ?? 'Error inesperado.'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        input:focus { outline: none !important; border-color: #111111 !important; }
+        input::placeholder { color: #ADADAA; }
+        * { box-sizing: border-box; }
+      `}</style>
+
+      <div style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        fontFamily: T.font,
+        background: T.canvas,
+      }}>
+
+        {/* ── Left Panel ─────────────────────────────────────────────── */}
+        <div style={{
+          flex: '0 0 40%',
+          background: T.text,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '3rem',
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: '100dvh',
+        }}>
+          {/* Ambient blob */}
+          <div style={{
+            position: 'absolute', top: '-20%', right: '-20%',
+            width: '400px', height: '400px',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)',
+            borderRadius: '50%', pointerEvents: 'none',
+          }} />
+
+          {/* Brand */}
+          <div>
+            <div style={{
+              fontSize: '0.7rem', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.4)',
+              textTransform: 'uppercase', marginBottom: '0.6rem', fontWeight: 500,
+            }}>
+              Plataforma de Gestión
+            </div>
+            <div style={{
+              fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF',
+              letterSpacing: '-0.02em', lineHeight: 1.2,
+            }}>
+              Innovatech<br />Solutions
+            </div>
+          </div>
+
+          {/* Middle content */}
+          <div>
+            <div style={{
+              width: '32px', height: '1px', background: 'rgba(255,255,255,0.2)',
+              marginBottom: '1.5rem',
+            }} />
+            <p style={{
+              fontSize: '0.9rem', color: 'rgba(255,255,255,0.5)',
+              lineHeight: 1.7, maxWidth: '240px',
+            }}>
+              Centraliza la gestión de proyectos, recursos y métricas en un solo lugar.
+            </p>
+          </div>
+
+          {/* Footer */}
+          <div style={{
+            fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)', letterSpacing: '0.03em',
+          }}>
+            &copy; {new Date().getFullYear()} Innovatech Solutions
+          </div>
+        </div>
+
+        {/* ── Right Panel ────────────────────────────────────────────── */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '3rem 2rem',
+          background: `radial-gradient(ellipse at 80% 20%, rgba(180,160,130,0.04) 0%, transparent 60%), ${T.canvas}`,
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '380px',
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? 'translateY(0)' : 'translateY(14px)',
+            transition: 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+          }}>
+
+            {/* Heading */}
+            <div style={{ marginBottom: '2.5rem' }}>
+              <h1 style={{
+                fontSize: '1.6rem', fontWeight: 700, color: T.text,
+                letterSpacing: '-0.03em', marginBottom: '0.4rem',
+              }}>
+                Bienvenido de vuelta
+              </h1>
+              <p style={{ fontSize: '0.875rem', color: T.muted }}>
+                Ingresa tus credenciales para continuar
+              </p>
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div role="alert" style={{
+                background: T.errBg,
+                border: `1px solid ${T.errBorder}`,
+                borderRadius: '6px',
+                padding: '0.7rem 0.9rem',
+                color: T.errText,
+                fontSize: '0.83rem',
+                marginBottom: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                {error}
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate>
+              <FieldGroup
+                id="email" name="email" type="email"
+                label="Correo electrónico"
+                placeholder="correo@empresa.cl"
+                value={form.email}
+                onChange={handleChange}
+              />
+              <FieldGroup
+                id="password" name="password" type="password"
+                label="Contraseña"
+                placeholder="Tu contraseña"
+                value={form.password}
+                onChange={handleChange}
+                style={{ marginBottom: '1.75rem' }}
+              />
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                onMouseEnter={() => setBtnHover(true)}
+                onMouseLeave={() => setBtnHover(false)}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  background: loading ? '#555' : (btnHover ? T.btnHover : T.btnBg),
+                  color: T.btnText,
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem',
+                  fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  fontFamily: T.font,
+                  letterSpacing: '-0.01em',
+                  transition: 'background 0.18s ease, transform 0.1s ease',
+                  transform: 'scale(1)',
+                }}
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.98)' }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)' }}
+              >
+                {loading ? <SpinnerIcon /> : null}
+                {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+                {!loading && <ArrowRight />}
+              </button>
+            </form>
+
+            {/* Divider + Register link */}
+            <div style={{
+              marginTop: '2rem',
+              paddingTop: '1.5rem',
+              borderTop: `1px solid ${T.border}`,
+              textAlign: 'center',
+            }}>
+              <span style={{ fontSize: '0.83rem', color: T.muted }}>
+                Sin cuenta todavía?{' '}
+                <Link to="/register" style={{
+                  color: T.text, fontWeight: 600, textDecoration: 'none',
+                  borderBottom: '1px solid #EAEAEA',
+                  paddingBottom: '1px',
+                  transition: 'border-color 0.15s',
+                }}>
+                  Regístrate
+                </Link>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Field Component ──────────────────────────────────────────────────────────
+function FieldGroup({ id, name, type, label, placeholder, value, onChange, style: extraStyle = {} }) {
+  const [focused, setFocused] = useState(false)
+  return (
+    <div style={{ marginBottom: '1.1rem', ...extraStyle }}>
+      <label htmlFor={id} style={{
+        display: 'block',
+        fontSize: '0.8rem',
+        fontWeight: 600,
+        color: '#111111',
+        marginBottom: '0.4rem',
+        letterSpacing: '0.01em',
+      }}>
+        {label}
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={{
+          width: '100%',
+          padding: '0.65rem 0.85rem',
+          border: `1px solid ${focused ? '#111111' : '#EAEAEA'}`,
+          borderRadius: '6px',
+          fontSize: '0.9rem',
+          background: '#FFFFFF',
+          color: '#111111',
+          outline: 'none',
+          fontFamily: "'Geist Sans','Helvetica Neue',-apple-system,sans-serif",
+          transition: 'border-color 0.18s ease',
+        }}
+      />
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/RegisterPage.jsx">
+import { useState, useEffect } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { register } from '../services/authService.js'
+import { useAuth } from '../context/AuthContext.jsx'
+
+// ── SVG Icons ────────────────────────────────────────────────────────────────
+const EyeIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+)
+
+const EyeOffIcon = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+)
+
+const SpinnerIcon = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ animation: 'spin 0.8s linear infinite' }}>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+  </svg>
+)
+
+const ArrowRight = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="5" y1="12" x2="19" y2="12"/>
+    <polyline points="12 5 19 12 12 19"/>
+  </svg>
+)
+
+// ── Tokens ──────────────────────────────────────────────────────────────────
+const T = {
+  canvas:    '#FBFBFA',
+  surface:   '#FFFFFF',
+  border:    '#EAEAEA',
+  text:      '#111111',
+  muted:     '#787774',
+  btnBg:     '#111111',
+  btnText:   '#FFFFFF',
+  btnHover:  '#333333',
+  errBg:     '#FDEBEC',
+  errText:   '#9F2F2D',
+  errBorder: 'rgba(159,47,45,0.2)',
+  font:      "'Geist Sans','Helvetica Neue',-apple-system,BlinkMacSystemFont,sans-serif",
+}
+
+// ── Password Validation ──────────────────────────────────────────────────────
+const ALLOWED_SPECIAL = /[.@#$*_?]/
+const OBVIOUS_PATTERNS = [
+  /^12345678/, /^87654321/, /^abcdefgh/i, /^hgfedcba/i,
+  /^qwertyui/i, /^asdfghjk/i, /^zxcvbnm/i,
+  /^11111111/, /^00000000/, /^password/i, /^passw0rd/i,
+  /(.)\\1{4,}/,
+]
+
+function validatePassword(pwd) {
+  const errors = []
+  if (pwd.length < 8)                              errors.push('Mínimo 8 caracteres')
+  if (!/^[A-Z]/.test(pwd))                         errors.push('Debe comenzar con mayúscula')
+  if (!ALLOWED_SPECIAL.test(pwd))                  errors.push('Incluir especial: . @ # $ * _ ?')
+  if (OBVIOUS_PATTERNS.some(p => p.test(pwd)))     errors.push('Evita patrones obvios')
+  return errors
+}
+
+function getStrength(pwd) {
+  if (!pwd) return { score: 0, level: '', barColor: T.border, width: '0%' }
+  let score = 0
+  if (pwd.length >= 8)  score += 15
+  if (pwd.length >= 10) score += 10
+  if (pwd.length >= 14) score += 10
+  if (/[A-Z]/.test(pwd))           score += 15
+  if (/[a-z]/.test(pwd))           score += 15
+  if (/[0-9]/.test(pwd))           score += 15
+  if (ALLOWED_SPECIAL.test(pwd))   score += 20
+  const types = [/[A-Z]/, /[a-z]/, /[0-9]/, ALLOWED_SPECIAL].filter(r => r.test(pwd)).length
+  if (types >= 4) score += 10
+  if (OBVIOUS_PATTERNS.some(p => p.test(pwd))) score = Math.max(score - 40, 0)
+  score = Math.min(score, 100)
+  if (score <= 20) return { score, level: 'Muy débil',  barColor: '#9F2F2D', width: `${score}%` }
+  if (score <= 40) return { score, level: 'Débil',      barColor: '#9F2F2D', width: `${score}%` }
+  if (score <= 60) return { score, level: 'Normal',     barColor: '#956400', width: `${score}%` }
+  if (score <= 80) return { score, level: 'Fuerte',     barColor: '#346538', width: `${score}%` }
+  return               { score, level: 'Muy fuerte', barColor: '#346538', width: `${score}%` }
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
+export default function RegisterPage() {
+  const navigate = useNavigate()
+  const { login: authLogin } = useAuth()
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'EMPLOYEE' })
+  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [showPass, setShowPass] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  const [btnHover, setBtnHover] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setMounted(true), 30)
+    return () => clearTimeout(t)
+  }, [])
+
+  const strength = getStrength(form.password)
+  const pwdErrors = validatePassword(form.password)
+
+  const handleChange = (e) => {
+    setForm(p => ({ ...p, [e.target.name]: e.target.value }))
+    setError(null)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!form.name || !form.email || !form.password) { setError('Completa todos los campos.'); return }
+    if (pwdErrors.length > 0) { setError(pwdErrors[0]); return }
+    setLoading(true)
+    try {
+      const res = await register(form)
+      authLogin({ id: res.userId, name: res.name, email: res.email, role: res.role }, res.token)
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.status === 400 ? 'El email ya está registrado.' : (err.message ?? 'Error inesperado.'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <>
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        input:focus, select:focus { outline: none !important; border-color: #111111 !important; }
+        input::placeholder { color: #ADADAA; }
+        * { box-sizing: border-box; }
+      `}</style>
+
+      <div style={{
+        minHeight: '100dvh',
+        display: 'flex',
+        fontFamily: T.font,
+        background: T.canvas,
+      }}>
+
+        {/* ── Left Panel ─────────────────────────────────────────────── */}
+        <div style={{
+          flex: '0 0 38%',
+          background: T.text,
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          padding: '3rem',
+          position: 'relative',
+          overflow: 'hidden',
+          minHeight: '100dvh',
+        }}>
+          <div style={{
+            position: 'absolute', bottom: '-10%', left: '-10%',
+            width: '320px', height: '320px',
+            background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)',
+            borderRadius: '50%', pointerEvents: 'none',
+          }} />
+
+          <div>
+            <div style={{
+              fontSize: '0.7rem', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.4)',
+              textTransform: 'uppercase', marginBottom: '0.6rem', fontWeight: 500,
+            }}>
+              Nueva cuenta
+            </div>
+            <div style={{
+              fontSize: '1.5rem', fontWeight: 700, color: '#FFFFFF',
+              letterSpacing: '-0.02em', lineHeight: 1.2,
+            }}>
+              Innovatech<br />Solutions
+            </div>
+          </div>
+
+          <div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {[
+                ['Proyectos', 'Crea y gestiona proyectos de software, consultoría e infraestructura.'],
+                ['Recursos', 'Asigna equipos y monitorea la disponibilidad en tiempo real.'],
+                ['Métricas', 'KPIs y reportes de avance para tomar decisiones informadas.'],
+              ].map(([title, desc]) => (
+                <div key={title}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 600, color: 'rgba(255,255,255,0.7)', marginBottom: '0.2rem' }}>
+                    {title}
+                  </div>
+                  <div style={{ fontSize: '0.76rem', color: 'rgba(255,255,255,0.35)', lineHeight: 1.5 }}>
+                    {desc}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.2)' }}>
+            &copy; {new Date().getFullYear()} Innovatech Solutions
+          </div>
+        </div>
+
+        {/* ── Right Panel (Form) ──────────────────────────────────────── */}
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '3rem 2rem',
+          background: `radial-gradient(ellipse at 20% 80%, rgba(180,160,130,0.04) 0%, transparent 60%), ${T.canvas}`,
+          overflowY: 'auto',
+        }}>
+          <div style={{
+            width: '100%',
+            maxWidth: '400px',
+            paddingTop: '1rem',
+            paddingBottom: '2rem',
+            opacity: mounted ? 1 : 0,
+            transform: mounted ? 'translateY(0)' : 'translateY(14px)',
+            transition: 'opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1)',
+          }}>
+
+            <div style={{ marginBottom: '2rem' }}>
+              <h1 style={{
+                fontSize: '1.6rem', fontWeight: 700, color: T.text,
+                letterSpacing: '-0.03em', marginBottom: '0.4rem',
+              }}>
+                Crea tu cuenta
+              </h1>
+              <p style={{ fontSize: '0.875rem', color: T.muted }}>
+                Accede a todas las herramientas de Innovatech
+              </p>
+            </div>
+
+            {/* API Error */}
+            {error && (
+              <div role="alert" style={{
+                background: T.errBg, border: `1px solid ${T.errBorder}`,
+                borderRadius: '6px', padding: '0.7rem 0.9rem',
+                color: T.errText, fontSize: '0.83rem', marginBottom: '1.25rem',
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+              }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                </svg>
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} noValidate>
+
+              {/* Name */}
+              <InputField id="name" name="name" type="text" label="Nombre completo"
+                placeholder="Ej: Ana García" value={form.name} onChange={handleChange} />
+
+              {/* Email */}
+              <InputField id="email" name="email" type="email" label="Correo electrónico"
+                placeholder="correo@empresa.cl" value={form.email} onChange={handleChange} />
+
+              {/* Password */}
+              <div style={{ marginBottom: '1rem' }}>
+                <label htmlFor="password" style={{
+                  display: 'block', fontSize: '0.8rem', fontWeight: 600,
+                  color: T.text, marginBottom: '0.4rem',
+                }}>
+                  Contraseña
+                  <span style={{ fontWeight: 400, color: T.muted, fontSize: '0.75rem', marginLeft: '0.4rem' }}>
+                    (mín. 8 · mayúscula inicial · especial)
+                  </span>
+                </label>
+                <PasswordInput
+                  id="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  showPass={showPass}
+                  onToggle={() => setShowPass(p => !p)}
+                  isInvalid={form.password.length > 0 && pwdErrors.length > 0}
+                />
+
+                {/* Strength bar */}
+                {form.password.length > 0 && (
+                  <div style={{ marginTop: '0.6rem' }}>
+                    <div style={{
+                      height: '3px', background: T.border, borderRadius: '2px', overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        height: '100%', borderRadius: '2px',
+                        background: strength.barColor,
+                        width: strength.width,
+                        transition: 'width 0.3s ease, background 0.3s ease',
+                      }} />
+                    </div>
+                    <div style={{
+                      display: 'flex', justifyContent: 'space-between',
+                      alignItems: 'flex-start', marginTop: '0.4rem',
+                    }}>
+                      <span style={{ fontSize: '0.75rem', color: strength.barColor, fontWeight: 500 }}>
+                        {strength.level}
+                      </span>
+                    </div>
+                    {pwdErrors.length > 0 && (
+                      <ul style={{
+                        margin: '0.4rem 0 0 0', padding: '0',
+                        listStyle: 'none',
+                      }}>
+                        {pwdErrors.map(err => (
+                          <li key={err} style={{
+                            fontSize: '0.75rem', color: T.muted,
+                            display: 'flex', alignItems: 'center', gap: '0.3rem',
+                            marginBottom: '0.2rem',
+                          }}>
+                            <span style={{ color: T.errText, fontSize: '0.65rem' }}>&#x25CF;</span>
+                            {err}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Role */}
+              <div style={{ marginBottom: '1.75rem' }}>
+                <label htmlFor="role" style={{
+                  display: 'block', fontSize: '0.8rem', fontWeight: 600,
+                  color: T.text, marginBottom: '0.4rem',
+                }}>
+                  Perfil de acceso
+                </label>
+                <select
+                  id="role" name="role"
+                  value={form.role}
+                  onChange={handleChange}
+                  style={{
+                    width: '100%', padding: '0.65rem 0.85rem',
+                    border: `1px solid ${T.border}`, borderRadius: '6px',
+                    fontSize: '0.9rem', background: '#FFFFFF', color: T.text,
+                    outline: 'none', fontFamily: T.font,
+                    cursor: 'pointer', appearance: 'none',
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23787774' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E")`,
+                    backgroundRepeat: 'no-repeat',
+                    backgroundPosition: 'right 0.85rem center',
+                    paddingRight: '2.5rem',
+                  }}
+                >
+                  <option value="EMPLOYEE">Empleado</option>
+                  <option value="MANAGER">Manager</option>
+                  <option value="ADMIN">Administrador</option>
+                </select>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={loading}
+                onMouseEnter={() => setBtnHover(true)}
+                onMouseLeave={() => setBtnHover(false)}
+                onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.98)' }}
+                onMouseUp={e => { e.currentTarget.style.transform = 'scale(1)' }}
+                style={{
+                  width: '100%',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                  padding: '0.75rem 1.5rem',
+                  background: loading ? '#555' : (btnHover ? T.btnHover : T.btnBg),
+                  color: T.btnText,
+                  border: 'none', borderRadius: '6px',
+                  fontSize: '0.9rem', fontWeight: 600,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  fontFamily: T.font, letterSpacing: '-0.01em',
+                  transition: 'background 0.18s ease, transform 0.1s ease',
+                }}
+              >
+                {loading ? <SpinnerIcon /> : null}
+                {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+                {!loading && <ArrowRight />}
+              </button>
+            </form>
+
+            <div style={{
+              marginTop: '2rem', paddingTop: '1.5rem',
+              borderTop: `1px solid ${T.border}`, textAlign: 'center',
+            }}>
+              <span style={{ fontSize: '0.83rem', color: T.muted }}>
+                Ya tienes cuenta?{' '}
+                <Link to="/login" style={{
+                  color: T.text, fontWeight: 600, textDecoration: 'none',
+                  borderBottom: '1px solid #EAEAEA', paddingBottom: '1px',
+                }}>
+                  Inicia sesión
+                </Link>
+              </span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ── Subcomponents ────────────────────────────────────────────────────────────
+function InputField({ id, name, type, label, placeholder, value, onChange }) {
+  const [focused, setFocused] = useState(false)
+  const T = {
+    text: '#111111', muted: '#787774', border: '#EAEAEA',
+    font: "'Geist Sans','Helvetica Neue',-apple-system,sans-serif",
+  }
+  return (
+    <div style={{ marginBottom: '1.1rem' }}>
+      <label htmlFor={id} style={{
+        display: 'block', fontSize: '0.8rem', fontWeight: 600,
+        color: T.text, marginBottom: '0.4rem',
+      }}>
+        {label}
+      </label>
+      <input
+        id={id} name={name} type={type}
+        value={value} onChange={onChange} placeholder={placeholder}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={{
+          width: '100%', padding: '0.65rem 0.85rem',
+          border: `1px solid ${focused ? '#111111' : T.border}`,
+          borderRadius: '6px', fontSize: '0.9rem',
+          background: '#FFFFFF', color: T.text, outline: 'none',
+          fontFamily: T.font,
+          transition: 'border-color 0.18s ease',
+        }}
+      />
+    </div>
+  )
+}
+
+function PasswordInput({ id, value, onChange, showPass, onToggle, isInvalid }) {
+  const [focused, setFocused] = useState(false)
+  const border = isInvalid ? 'rgba(159,47,45,0.4)' : (focused ? '#111111' : '#EAEAEA')
+  return (
+    <div style={{ position: 'relative' }}>
+      <input
+        id={id} name="password"
+        type={showPass ? 'text' : 'password'}
+        value={value} onChange={onChange}
+        placeholder="Crea tu contraseña segura"
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        style={{
+          width: '100%', padding: '0.65rem 2.8rem 0.65rem 0.85rem',
+          border: `1px solid ${border}`,
+          borderRadius: '6px', fontSize: '0.9rem',
+          background: '#FFFFFF', color: '#111111', outline: 'none',
+          fontFamily: "'Geist Sans','Helvetica Neue',-apple-system,sans-serif",
+          transition: 'border-color 0.18s ease',
+        }}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={showPass ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        style={{
+          position: 'absolute', right: '0.8rem', top: '50%',
+          transform: 'translateY(-50%)',
+          background: 'none', border: 'none', cursor: 'pointer',
+          color: '#787774', padding: 0, display: 'flex', alignItems: 'center',
+        }}
+      >
+        {showPass ? <EyeOffIcon /> : <EyeIcon />}
+      </button>
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/authService.js">
+import api, { call } from './api.js'
+
+export const login       = (credentials) => call(() => api.post('/api/auth/login', credentials).then(r => r.data))
+export const register    = (userData)    => call(() => api.post('/api/auth/register', userData).then(r => r.data))
+export const getUsers    = ()            => call(() => api.get('/api/auth/users').then(r => r.data))
+export const getEmployees= ()            => getUsers().then(list => list.filter(u => u.role === 'EMPLOYEE'))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/projectService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/projects'
+
+export const getProjects         = (params = {})             => call(() => api.get(`${BASE}/`, { params }).then(r => r.data))
+export const getProjectById      = (id)                      => call(() => api.get(`${BASE}/${id}`).then(r => r.data))
+export const createProject       = (data)                    => call(() => api.post(`${BASE}/`, data).then(r => r.data))
+export const updateProject       = (id, data)                => call(() => api.put(`${BASE}/${id}`, data).then(r => r.data))
+export const deleteProject       = (id)                      => call(() => api.delete(`${BASE}/${id}`))
+export const updateProjectStatus = (id, status)              => call(() => api.patch(`${BASE}/${id}/status`, { status }).then(r => r.data))
+export const assignEmployee      = (id, employeeId, name)    => call(() => api.patch(`${BASE}/${id}/assign`, { employeeId, employeeName: name }).then(r => r.data))
+export const unassignEmployee    = (id)                      => call(() => api.delete(`${BASE}/${id}/assign`).then(r => r.data))
+export const getNotes            = (id)                      => call(() => api.get(`${BASE}/${id}/notes`).then(r => r.data))
+export const addNote             = (id, content)             => call(() => api.post(`${BASE}/${id}/notes`, { content }).then(r => r.data))
+export const reviewNote          = (id, noteId, data)        => call(() => api.patch(`${BASE}/${id}/notes/${noteId}/review`, data).then(r => r.data))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/vite.config.js">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: true,   // Docker: expone Vite en 0.0.0.0, no solo en el loopback del contenedor
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        // Sin rewrite: el BFF ya monta sus rutas bajo /api/*
+      },
+    },
+  },
+})
+</file>
+
+<file path="README.md">
+# 🖥️ innovatech-frontend-valdes-munoz
+
+> **Frontend** de la plataforma Innovatech Solutions — Evaluación Parcial 2  
+> Asignatura: DSY1106 – Desarrollo Fullstack III | Instituto DuocUC | 2026  
+> Estudiantes: **Benjamín Valdés** · **Ignacio Muñoz**
+
+---
+
+## 📑 Tabla de Contenidos
+
+1. [Descripción del Proyecto](#descripción-del-proyecto)
+2. [Tecnologías Utilizadas](#tecnologías-utilizadas)
+3. [Estructura del Proyecto](#estructura-del-proyecto)
+4. [Requisitos Previos](#requisitos-previos)
+5. [Instalación Paso a Paso](#instalación-paso-a-paso)
+6. [Ejecución en Desarrollo](#ejecución-en-desarrollo)
+7. [Variables de Entorno](#variables-de-entorno)
+8. [Funcionalidades Implementadas](#funcionalidades-implementadas)
+9. [Rutas de la Aplicación](#rutas-de-la-aplicación)
+10. [Componentes Principales](#componentes-principales)
+11. [Conexión con el Backend (BFF)](#conexión-con-el-backend-bff)
+12. [Construcción para Producción](#construcción-para-producción)
+13. [Resolución de Problemas Comunes](#resolución-de-problemas-comunes)
+
+---
+
+## 📌 Descripción del Proyecto
+
+Este repositorio contiene el componente **frontend** de la plataforma Innovatech Solutions, desarrollado con **React 18** y **Vite**. Implementa las vistas de autenticación (registro e inicio de sesión) y el dashboard principal del sistema, consumiendo los servicios expuestos por el BFF (Backend For Frontend).
+
+### Arquitectura en Contexto
+
+```
+[Browser / Usuario]
+        ↓
+[Frontend React - :5173]
+        ↓  (fetch HTTP)
+[BFF Node.js - :3001]
+        ↓  (HTTP / JWT)
+[Kong API Gateway - :8000]
+        ↓
+[Microservicios: ms-auth (:8081) | ms-proyectos (:8082)]
+```
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+| Tecnología | Versión | Propósito |
+|------------|---------|-----------|
+| React | 18.x | Librería de UI basada en componentes |
+| Vite | 5.x | Bundler y servidor de desarrollo |
+| React Router DOM | 6.x | Enrutamiento SPA |
+| Context API | (nativo) | Gestión de estado de autenticación |
+| CSS Modules | (nativo) | Estilos encapsulados por componente |
+| Node.js | ≥ 18 | Entorno de ejecución |
+| NPM | ≥ 9 | Gestor de paquetes |
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+innovatech-frontend-valdes-munoz/
+├── public/
+│   ├── favicon.svg          # Ícono de la aplicación
+│   └── icons.svg            # Íconos del sistema
+├── src/
+│   ├── assets/
+│   │   ├── hero.png         # Imagen principal del hero
+│   │   ├── react.svg        # Logo de React
+│   │   └── vite.svg         # Logo de Vite
+│   ├── components/
+│   │   └── PrivateRoute.jsx # HOC protector de rutas autenticadas
+│   ├── context/
+│   │   └── AuthContext.jsx  # Contexto global de autenticación
+│   ├── pages/
+│   │   ├── LoginPage.jsx    # Página de inicio de sesión
+│   │   ├── RegisterPage.jsx # Página de registro de usuario
+│   │   └── DashboardPage.jsx# Dashboard principal (ruta protegida)
+│   ├── services/
+│   │   ├── authService.js   # Llamadas HTTP a endpoints de auth (/api/auth)
+│   │   └── projectService.js# Llamadas HTTP a endpoints de proyectos (/api/projects)
+│   ├── App.jsx              # Componente raíz con definición de rutas
+│   ├── App.css              # Estilos globales
+│   ├── index.css            # Reset CSS y variables globales
+│   └── main.jsx             # Punto de entrada de React
+├── index.html               # HTML raíz (Vite)
+├── vite.config.js           # Configuración de Vite (proxy al BFF)
+├── package.json             # Dependencias y scripts NPM
+├── eslint.config.js         # Reglas de linting
+└── README.md                # Este archivo
+```
+
+---
+
+## ✅ Requisitos Previos
+
+Antes de instalar el frontend, asegúrate de tener instalado:
+
+1. **Node.js ≥ 18** — [Descargar en nodejs.org](https://nodejs.org)
+2. **NPM ≥ 9** — Se instala automáticamente con Node.js
+3. **BFF corriendo** — El BFF debe estar activo en `http://localhost:3001`
+4. **Microservicios corriendo** — ms-auth y ms-proyectos deben estar activos
+
+Verificar instalaciones:
+```bash
+node --version    # Debe mostrar v18.x o superior
+npm --version     # Debe mostrar 9.x o superior
+```
+
+---
+
+## 📥 Instalación Paso a Paso
+
+### Paso 1: Clonar el repositorio
+
+```bash
+git clone https://github.com/TU_USUARIO/innovatech-frontend-valdes-munoz.git
+cd innovatech-frontend-valdes-munoz
+```
+
+### Paso 2: Instalar dependencias
+
+```bash
+npm install
+```
+
+Este comando descarga todas las dependencias listadas en `package.json` al directorio `node_modules/`. Puede tomar 1-3 minutos dependiendo de la conexión a internet.
+
+**Salida esperada:**
+```
+added 312 packages, and audited 313 packages in 45s
+```
+
+---
+
+## ▶️ Ejecución en Desarrollo
+
+```bash
+npm run dev
+```
+
+**Salida esperada en consola:**
+```
+  VITE v5.x.x  ready in 500 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://192.168.x.x:5173/
+  ➜  press h + enter to show help
+```
+
+Abrir en el navegador: **http://localhost:5173**
+
+> ⚠️ **Importante:** El frontend requiere que el BFF esté corriendo en `http://localhost:3001`. Si el BFF no está activo, las llamadas a `/api/*` retornarán errores de conexión.
+
+---
+
+## 🔧 Variables de Entorno
+
+El frontend **no requiere archivo `.env`** para funcionar en desarrollo. La URL del BFF está configurada en `vite.config.js` mediante un proxy:
+
+```javascript
+// vite.config.js
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+      }
+    }
+  }
+})
+```
+
+Esto redirige automáticamente todas las peticiones a `/api/*` hacia `http://localhost:3001/api/*`, eliminando problemas de CORS en desarrollo.
+
+---
+
+## 🚀 Funcionalidades Implementadas
+
+### Autenticación
+- ✅ **Registro de usuario** — Formulario con validación (username, email, password, rol)
+- ✅ **Inicio de sesión** — Formulario con manejo de errores (credenciales inválidas)
+- ✅ **Gestión de token JWT** — Almacenamiento en `localStorage`, incluido en headers HTTP
+- ✅ **Logout** — Limpieza del token y redirección al login
+- ✅ **Rutas protegidas** — Redirección automática al login si no hay sesión activa
+
+### Dashboard
+- ✅ **Vista de proyectos** — Listado de proyectos del usuario autenticado
+- ✅ **Perfil de usuario** — Visualización del nombre y rol del usuario logueado
+- ✅ **Indicador de estado del sistema** — Muestra si el backend está disponible
+
+---
+
+## 🗺️ Rutas de la Aplicación
+
+| Ruta | Componente | Acceso | Descripción |
+|------|-----------|--------|-------------|
+| `/` | Redirect | Público | Redirige a `/login` o `/dashboard` según autenticación |
+| `/login` | LoginPage | Público | Formulario de inicio de sesión |
+| `/register` | RegisterPage | Público | Formulario de registro de nuevo usuario |
+| `/dashboard` | DashboardPage | Privado | Vista principal del sistema (requiere JWT) |
+
+Las rutas privadas están protegidas por el componente `PrivateRoute`, que verifica la existencia del token JWT en el contexto de autenticación. Si no hay token, redirige automáticamente a `/login`.
+
+---
+
+## 🧩 Componentes Principales
+
+### AuthContext (`src/context/AuthContext.jsx`)
+
+Contexto React que gestiona el estado global de autenticación:
+
+```jsx
+// Estado disponible en toda la aplicación
+const { user, token, login, logout, isAuthenticated } = useAuth();
+```
+
+- `user` — Objeto con datos del usuario (username, email, rol)
+- `token` — JWT almacenado en localStorage
+- `login(credentials)` — Llama a authService y actualiza el estado
+- `logout()` — Limpia el token y redirige al login
+- `isAuthenticated` — Boolean que indica si hay sesión activa
+
+### PrivateRoute (`src/components/PrivateRoute.jsx`)
+
+Higher-Order Component que protege rutas autenticadas:
+
+```jsx
+<Route path="/dashboard" element={
+  <PrivateRoute>
+    <DashboardPage />
+  </PrivateRoute>
+} />
+```
+
+### authService (`src/services/authService.js`)
+
+Capa de servicio para llamadas HTTP a endpoints de autenticación:
+
+| Función | Endpoint BFF | Método | Descripción |
+|---------|-------------|--------|-------------|
+| `register(data)` | `/api/auth/register` | POST | Registra nuevo usuario |
+| `login(credentials)` | `/api/auth/login` | POST | Autentica usuario y retorna JWT |
+| `getProfile()` | `/api/auth/profile` | GET | Obtiene datos del usuario autenticado |
+
+---
+
+## 🔌 Conexión con el Backend (BFF)
+
+El frontend se comunica **exclusivamente con el BFF** (nunca directamente con los microservicios). El BFF actúa como intermediario, valida el JWT y enruta las peticiones.
+
+**Flujo de autenticación:**
+
+```
+1. Usuario llena formulario de login
+2. LoginPage → authService.login(credentials)
+3. authService → POST /api/auth/login (al BFF via proxy Vite)
+4. BFF → POST http://ms-auth:8081/auth/login
+5. ms-auth valida credenciales → retorna JWT
+6. BFF → retorna JWT al frontend
+7. AuthContext almacena JWT en localStorage
+8. React Router redirige a /dashboard
+```
+
+**Headers enviados en peticiones autenticadas:**
+```
+Authorization: Bearer <JWT_TOKEN>
+Content-Type: application/json
+```
+
+---
+
+## 🏗️ Construcción para Producción
+
+```bash
+npm run build
+```
+
+Genera el directorio `dist/` con los archivos estáticos optimizados:
+
+```
+dist/
+├── index.html
+├── assets/
+│   ├── index-[hash].js   (bundle JS)
+│   └── index-[hash].css  (bundle CSS)
+└── ...
+```
+
+Para previsualizar la build antes de desplegar:
+```bash
+npm run preview
+# Disponible en http://localhost:4173
+```
+
+---
+
+## 🩺 Resolución de Problemas Comunes
+
+### ❌ Error: "Cannot connect to localhost:3001"
+
+**Causa:** El BFF no está corriendo.  
+**Solución:** Iniciar el BFF con `npm run dev` en el directorio `innovatech-bff-valdes-munoz/`.
+
+### ❌ Error: "401 Unauthorized" al acceder al dashboard
+
+**Causa:** El token JWT expiró o es inválido.  
+**Solución:** Hacer logout y volver a iniciar sesión.
+
+### ❌ Error: "node_modules not found" al ejecutar `npm run dev`
+
+**Causa:** Las dependencias no están instaladas.  
+**Solución:** Ejecutar `npm install` en el directorio raíz del proyecto.
+
+### ❌ La página muestra pantalla en blanco
+
+**Causa:** Error de JavaScript en consola del navegador.  
+**Solución:** Abrir DevTools (F12) → pestaña Console → revisar el error específico.
+
+### ❌ Error de CORS en peticiones al BFF
+
+**Causa:** No se está usando el proxy de Vite (se está accediendo directamente al BFF desde otra URL).  
+**Solución:** Acceder siempre a través de `http://localhost:5173`, no directamente a `http://localhost:3001`.
+
+---
+
+## 👥 Contribuidores
+
+| Estudiante | GitHub | Rol Principal |
+|-----------|--------|---------------|
+| Benjamín Valdés | @benjaminvaldes | BFF + ms-auth |
+| Ignacio Muñoz | @ignacionunoz | Frontend + ms-proyectos |
+
+---
+
+**Instituto DuocUC 2026 — DSY1106 Desarrollo Fullstack III —*
+</file>
+
+</files>
