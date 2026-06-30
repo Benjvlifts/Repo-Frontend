@@ -1,340 +1,45 @@
-# 🖥️ innovatech-frontend-valdes-munoz
+# Innovatech Solutions - Frontend Client (SPA)
 
-> **Frontend** de la plataforma Innovatech Solutions — Evaluación Parcial 2  
-> Asignatura: DSY1106 – Desarrollo Fullstack III | Instituto DuocUC | 2026  
-> Estudiantes: **Benjamín Valdés** · **Ignacio Muñoz**
+Este repositorio contiene la capa de presentación de **Innovatech Solutions**, una aplicación de página única (SPA) de alto rendimiento diseñada para la gestión inteligente de proyectos tecnológicos, visualización de KPIs y asignación de recursos. 
 
----
+La arquitectura se fundamenta en un cliente desacoplado que interactúa de manera puramente asíncrona mediante el patrón BFF (Backend For Frontend) utilizando transporte seguro sobre HTTP/REST.
 
-## 📑 Tabla de Contenidos
+## 1. Arquitectura y Tecnologías Core
 
-1. [Descripción del Proyecto](#descripción-del-proyecto)
-2. [Tecnologías Utilizadas](#tecnologías-utilizadas)
-3. [Estructura del Proyecto](#estructura-del-proyecto)
-4. [Requisitos Previos](#requisitos-previos)
-5. [Instalación Paso a Paso](#instalación-paso-a-paso)
-6. [Ejecución en Desarrollo](#ejecución-en-desarrollo)
-7. [Variables de Entorno](#variables-de-entorno)
-8. [Funcionalidades Implementadas](#funcionalidades-implementadas)
-9. [Rutas de la Aplicación](#rutas-de-la-aplicación)
-10. [Componentes Principales](#componentes-principales)
-11. [Conexión con el Backend (BFF)](#conexión-con-el-backend-bff)
-12. [Construcción para Producción](#construcción-para-producción)
-13. [Resolución de Problemas Comunes](#resolución-de-problemas-comunes)
+* **Librería Principal:** [React 19](https://react.dev/) (^19.2.5) - Aprovechando el nuevo motor de renderizado concurrente y gestión nativa de recursos.
+* **Herramienta de Empaquetado y Bundling:** [Vite 8](https://vite.dev/) (^8.0.10) - Compilación ultra-rápida basada en ESM nativo y transformaciones de código optimizadas.
+* **Enrutamiento:** React Router Dom (^7.6.0) - Declarativo y protegido por Guards de autenticación.
+* **Cliente HTTP:** Axios (^1.15.2) - Implementación de interceptores para la inyección automatizada de tokens JWT y manejo global de excepciones de red.
+* **Testing Engine:** [Vitest](https://vitest.dev/) (^4.1.9) + React Testing Library (^16.3.2) - Suite moderna de ejecución de pruebas en paralelo integrada nativamente en el pipeline de Vite.
 
 ---
 
-## 📌 Descripción del Proyecto
+## 2. Requisitos Previos
 
-Este repositorio contiene el componente **frontend** de la plataforma Innovatech Solutions, desarrollado con **React 18** y **Vite**. Implementa las vistas de autenticación (registro e inicio de sesión) y el dashboard principal del sistema, consumiendo los servicios expuestos por el BFF (Backend For Frontend).
+Antes de proceder con la instalación, asegúrese de contar con las herramientas correctas en su estación de trabajo:
 
-### Arquitectura en Contexto
+* **Node.js:** Versión `v20.x.x` (LTS recomendado) o superior. No se garantiza compatibilidad con versiones inferiores a v18.
+* **NPM:** Versión `10.x.x` o superior (incluido por defecto con Node.js).
 
-```
-[Browser / Usuario]
-        ↓
-[Frontend React - :5173]
-        ↓  (fetch HTTP)
-[BFF Node.js - :3001]
-        ↓  (HTTP / JWT)
-[Kong API Gateway - :8000]
-        ↓
-[Microservicios: ms-auth (:8081) | ms-proyectos (:8082)]
-```
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-| Tecnología | Versión | Propósito |
-|------------|---------|-----------|
-| React | 18.x | Librería de UI basada en componentes |
-| Vite | 5.x | Bundler y servidor de desarrollo |
-| React Router DOM | 6.x | Enrutamiento SPA |
-| Context API | (nativo) | Gestión de estado de autenticación |
-| CSS Modules | (nativo) | Estilos encapsulados por componente |
-| Node.js | ≥ 18 | Entorno de ejecución |
-| NPM | ≥ 9 | Gestor de paquetes |
-
----
-
-## 📁 Estructura del Proyecto
-
-```
-innovatech-frontend-valdes-munoz/
-├── public/
-│   ├── favicon.svg          # Ícono de la aplicación
-│   └── icons.svg            # Íconos del sistema
+Para verificar su entorno local, ejecute en su terminal:
+```bash
+node -v
+npm -v
+3. Instalación y Despliegue LocalSiga este orden cronológico para inicializar el servidor de desarrollo local:Clonar el repositorio y posicionarse en la carpeta raíz del frontend:Bashcd innovatech-frontend
+Instalar el árbol completo de dependencias (incluyendo las herramientas de desarrollo y pruebas):Bashnpm install
+Lanzar el servidor de desarrollo con recarga en caliente (Hot Module Replacement - HMR):Bashnpm run dev
+El cliente estará disponible de forma predeterminada en el puerto local: http://localhost:5173/.4. Estructura del ProyectoEl código fuente se encuentra modularizado bajo principios de cohesión interna y bajo acoplamiento:Plaintext├── public/                 # Recursos estáticos globales (íconos, imágenes base)
 ├── src/
-│   ├── assets/
-│   │   ├── hero.png         # Imagen principal del hero
-│   │   ├── react.svg        # Logo de React
-│   │   └── vite.svg         # Logo de Vite
-│   ├── components/
-│   │   └── PrivateRoute.jsx # HOC protector de rutas autenticadas
-│   ├── context/
-│   │   └── AuthContext.jsx  # Contexto global de autenticación
-│   ├── pages/
-│   │   ├── LoginPage.jsx    # Página de inicio de sesión
-│   │   ├── RegisterPage.jsx # Página de registro de usuario
-│   │   └── DashboardPage.jsx# Dashboard principal (ruta protegida)
-│   ├── services/
-│   │   ├── authService.js   # Llamadas HTTP a endpoints de auth (/api/auth)
-│   │   └── projectService.js# Llamadas HTTP a endpoints de proyectos (/api/projects)
-│   ├── App.jsx              # Componente raíz con definición de rutas
-│   ├── App.css              # Estilos globales
-│   ├── index.css            # Reset CSS y variables globales
-│   └── main.jsx             # Punto de entrada de React
-├── index.html               # HTML raíz (Vite)
-├── vite.config.js           # Configuración de Vite (proxy al BFF)
-├── package.json             # Dependencias y scripts NPM
-├── eslint.config.js         # Reglas de linting
-└── README.md                # Este archivo
-```
-
----
-
-## ✅ Requisitos Previos
-
-Antes de instalar el frontend, asegúrate de tener instalado:
-
-1. **Node.js ≥ 18** — [Descargar en nodejs.org](https://nodejs.org)
-2. **NPM ≥ 9** — Se instala automáticamente con Node.js
-3. **BFF corriendo** — El BFF debe estar activo en `http://localhost:3001`
-4. **Microservicios corriendo** — ms-auth y ms-proyectos deben estar activos
-
-Verificar instalaciones:
-```bash
-node --version    # Debe mostrar v18.x o superior
-npm --version     # Debe mostrar 9.x o superior
-```
-
----
-
-## 📥 Instalación Paso a Paso
-
-### Paso 1: Clonar el repositorio
-
-```bash
-git clone https://github.com/TU_USUARIO/innovatech-frontend-valdes-munoz.git
-cd innovatech-frontend-valdes-munoz
-```
-
-### Paso 2: Instalar dependencias
-
-```bash
-npm install
-```
-
-Este comando descarga todas las dependencias listadas en `package.json` al directorio `node_modules/`. Puede tomar 1-3 minutos dependiendo de la conexión a internet.
-
-**Salida esperada:**
-```
-added 312 packages, and audited 313 packages in 45s
-```
-
----
-
-## ▶️ Ejecución en Desarrollo
-
-```bash
-npm run dev
-```
-
-**Salida esperada en consola:**
-```
-  VITE v5.x.x  ready in 500 ms
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: http://192.168.x.x:5173/
-  ➜  press h + enter to show help
-```
-
-Abrir en el navegador: **http://localhost:5173**
-
-> ⚠️ **Importante:** El frontend requiere que el BFF esté corriendo en `http://localhost:3001`. Si el BFF no está activo, las llamadas a `/api/*` retornarán errores de conexión.
-
----
-
-## 🔧 Variables de Entorno
-
-El frontend **no requiere archivo `.env`** para funcionar en desarrollo. La URL del BFF está configurada en `vite.config.js` mediante un proxy:
-
-```javascript
-// vite.config.js
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
-        changeOrigin: true,
-      }
-    }
-  }
-})
-```
-
-Esto redirige automáticamente todas las peticiones a `/api/*` hacia `http://localhost:3001/api/*`, eliminando problemas de CORS en desarrollo.
-
----
-
-## 🚀 Funcionalidades Implementadas
-
-### Autenticación
-- ✅ **Registro de usuario** — Formulario con validación (username, email, password, rol)
-- ✅ **Inicio de sesión** — Formulario con manejo de errores (credenciales inválidas)
-- ✅ **Gestión de token JWT** — Almacenamiento en `localStorage`, incluido en headers HTTP
-- ✅ **Logout** — Limpieza del token y redirección al login
-- ✅ **Rutas protegidas** — Redirección automática al login si no hay sesión activa
-
-### Dashboard
-- ✅ **Vista de proyectos** — Listado de proyectos del usuario autenticado
-- ✅ **Perfil de usuario** — Visualización del nombre y rol del usuario logueado
-- ✅ **Indicador de estado del sistema** — Muestra si el backend está disponible
-
----
-
-## 🗺️ Rutas de la Aplicación
-
-| Ruta | Componente | Acceso | Descripción |
-|------|-----------|--------|-------------|
-| `/` | Redirect | Público | Redirige a `/login` o `/dashboard` según autenticación |
-| `/login` | LoginPage | Público | Formulario de inicio de sesión |
-| `/register` | RegisterPage | Público | Formulario de registro de nuevo usuario |
-| `/dashboard` | DashboardPage | Privado | Vista principal del sistema (requiere JWT) |
-
-Las rutas privadas están protegidas por el componente `PrivateRoute`, que verifica la existencia del token JWT en el contexto de autenticación. Si no hay token, redirige automáticamente a `/login`.
-
----
-
-## 🧩 Componentes Principales
-
-### AuthContext (`src/context/AuthContext.jsx`)
-
-Contexto React que gestiona el estado global de autenticación:
-
-```jsx
-// Estado disponible en toda la aplicación
-const { user, token, login, logout, isAuthenticated } = useAuth();
-```
-
-- `user` — Objeto con datos del usuario (username, email, rol)
-- `token` — JWT almacenado en localStorage
-- `login(credentials)` — Llama a authService y actualiza el estado
-- `logout()` — Limpia el token y redirige al login
-- `isAuthenticated` — Boolean que indica si hay sesión activa
-
-### PrivateRoute (`src/components/PrivateRoute.jsx`)
-
-Higher-Order Component que protege rutas autenticadas:
-
-```jsx
-<Route path="/dashboard" element={
-  <PrivateRoute>
-    <DashboardPage />
-  </PrivateRoute>
-} />
-```
-
-### authService (`src/services/authService.js`)
-
-Capa de servicio para llamadas HTTP a endpoints de autenticación:
-
-| Función | Endpoint BFF | Método | Descripción |
-|---------|-------------|--------|-------------|
-| `register(data)` | `/api/auth/register` | POST | Registra nuevo usuario |
-| `login(credentials)` | `/api/auth/login` | POST | Autentica usuario y retorna JWT |
-| `getProfile()` | `/api/auth/profile` | GET | Obtiene datos del usuario autenticado |
-
----
-
-## 🔌 Conexión con el Backend (BFF)
-
-El frontend se comunica **exclusivamente con el BFF** (nunca directamente con los microservicios). El BFF actúa como intermediario, valida el JWT y enruta las peticiones.
-
-**Flujo de autenticación:**
-
-```
-1. Usuario llena formulario de login
-2. LoginPage → authService.login(credentials)
-3. authService → POST /api/auth/login (al BFF via proxy Vite)
-4. BFF → POST http://ms-auth:8081/auth/login
-5. ms-auth valida credenciales → retorna JWT
-6. BFF → retorna JWT al frontend
-7. AuthContext almacena JWT en localStorage
-8. React Router redirige a /dashboard
-```
-
-**Headers enviados en peticiones autenticadas:**
-```
-Authorization: Bearer <JWT_TOKEN>
-Content-Type: application/json
-```
-
----
-
-## 🏗️ Construcción para Producción
-
-```bash
-npm run build
-```
-
-Genera el directorio `dist/` con los archivos estáticos optimizados:
-
-```
-dist/
-├── index.html
-├── assets/
-│   ├── index-[hash].js   (bundle JS)
-│   └── index-[hash].css  (bundle CSS)
-└── ...
-```
-
-Para previsualizar la build antes de desplegar:
-```bash
-npm run preview
-# Disponible en http://localhost:4173
-```
-
----
-
-## 🩺 Resolución de Problemas Comunes
-
-### ❌ Error: "Cannot connect to localhost:3001"
-
-**Causa:** El BFF no está corriendo.  
-**Solución:** Iniciar el BFF con `npm run dev` en el directorio `innovatech-bff-valdes-munoz/`.
-
-### ❌ Error: "401 Unauthorized" al acceder al dashboard
-
-**Causa:** El token JWT expiró o es inválido.  
-**Solución:** Hacer logout y volver a iniciar sesión.
-
-### ❌ Error: "node_modules not found" al ejecutar `npm run dev`
-
-**Causa:** Las dependencias no están instaladas.  
-**Solución:** Ejecutar `npm install` en el directorio raíz del proyecto.
-
-### ❌ La página muestra pantalla en blanco
-
-**Causa:** Error de JavaScript en consola del navegador.  
-**Solución:** Abrir DevTools (F12) → pestaña Console → revisar el error específico.
-
-### ❌ Error de CORS en peticiones al BFF
-
-**Causa:** No se está usando el proxy de Vite (se está accediendo directamente al BFF desde otra URL).  
-**Solución:** Acceder siempre a través de `http://localhost:5173`, no directamente a `http://localhost:3001`.
-
----
-
-## 👥 Contribuidores
-
-| Estudiante | GitHub | Rol Principal |
-|-----------|--------|---------------|
-| Benjamín Valdés | @benjaminvaldes | BFF + ms-auth |
-| Ignacio Muñoz | @ignacionunoz | Frontend + ms-proyectos |
-
----
-
-**Instituto DuocUC 2026 — DSY1106 Desarrollo Fullstack III —*
+│   ├── assets/             # Estilos CSS globales y recursos visuales compilables
+│   ├── components/         # Componentes atómicos e interfaces UI reutilizables
+│   ├── context/            # Estado global de la aplicación (Ej. AuthContext para RBAC)
+│   ├── reducers/           # Reducers puros para mutación de estados lógicos (Ej. authReducer)
+│   ├── views/              # Vistas completas de la SPA (KpiView, ProjectsView, etc.)
+│   ├── App.jsx             # Componente raíz y enrutador principal
+│   └── main.jsx            # Punto de entrada de la aplicación para el DOM de React
+├── package.json            # Manifiesto de dependencias y scripts de orquestación
+├── vite.config.js          # Configuración del compilador Vite
+└── vitest.config.js        # Configuración del motor de pruebas y cobertura
+5. Guía de Ejecución de Pruebas y Reportes de CalidadEl proyecto implementa una estricta política de aseguramiento de calidad (QA). Todos los componentes visuales críticos, contextos y funciones utilitarias deben estar cubiertos por pruebas unitarias automatizadas.5.1. Matriz de Comandos de TestingObjetivo TécnicoComando de EjecuciónDescripción OperacionalModo Interactivo (TDD)npm run test o npx vitestInicia la suite en modo observador (watch mode). Escanea cambios en tiempo real.Ejecución Única (CI)npm run test -- --runEjecuta las pruebas una sola vez y finaliza el proceso (ideal para pipelines de CI/CD).Generación de Coberturanpm run test:coverageCompila las pruebas, evalúa los caminos lógicos y genera el reporte HTML de JaCoCo/V8.5.2. Generación y Visualización del Reporte de Cobertura LocalPara auditar el estado actual del código en su estación local y comprobar los criterios de aceptación, ejecute:Bashnpm run test:coverage
+Este comando invoca el motor @vitest/coverage-v8, el cual intercepta las llamadas del árbol de renderizado virtual (JSDOM) y calcula las métricas exactas de inspección.Ruta del Reporte HTML:Una vez finalizada la ejecución, los artefactos visuales se compilarán en la siguiente ruta relativa:Plaintext/coverage/index.html
+Cómo visualizarlo:Abra el explorador de archivos de su sistema operativo.Navegue hasta la carpeta raíz del proyecto y acceda al directorio /coverage.Haga doble clic sobre el archivo index.html para abrir el panel gráfico interactivo en su navegador web predeterminado (Chrome, Firefox, Edge).5.3. Análisis de Métricas de Cobertura (Mínimo Rúbrica: 60%)El reporte gráfico de Vitest expone cuatro dimensiones fundamentales que deben ser analizadas críticamente:% Statements (Declaraciones): Mide el porcentaje de expresiones ejecutables que han sido procesadas por los tests (asignaciones, llamadas a funciones, etc.).% Branches (Ramas / Condicionales): Evalúa si los flujos de control binarios o múltiples (if, else, switch, operadores ternarios) fueron cruzados en ambos sentidos (verdadero y falso). Es la métrica más crítica para mitigar bugs en producción.% Functions (Funciones): Indica la cantidad de métodos y funciones declaradas que fueron invocadas al menos una vez durante las pruebas.% Lines (Líneas): Porcentaje de líneas físicas de código fuente visitadas por el motor de ejecución.⚠️ CONTROL DE CALIDAD (QUALITY GATE): De acuerdo con la rúbrica institucional y las políticas DevSecOps de Innovatech Solutions, ninguna métrica analizada debe estar por debajo del 60.0%. Si el reporte local marca un número inferior, la compilación se considerará fallida y el cambio no podrá ser integrado a la rama principal.
