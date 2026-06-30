@@ -78,6 +78,29 @@ README.md
 <files>
 This section contains the contents of the repository's files.
 
+<file path=".github/workflows/frontend-ci.yml">
+name: Frontend CI Pipeline
+
+on:
+  push:
+    branches: [ "main", "master" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+    - name: Install dependencies
+      run: npm ci
+    - name: Run Vitest
+      run: npm run test -- --run
+</file>
+
 <file path=".repomixignore">
 # Dependencias
 node_modules/
@@ -107,1135 +130,6 @@ build/
 *.svg
 *.exec
 *.zip
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/atoms.jsx">
-import { useState } from 'react'
-import { T } from './tokens.js'
-
-export const Spinner = ({ size = 20, color = T.color.brand }) => (
-  <div style={{
-    width: size, height: size,
-    border: `2px solid ${color}30`,
-    borderTopColor: color,
-    borderRadius: '50%',
-    animation: 'innovatech-spin 0.7s linear infinite',
-  }}/>
-)
-
-export const StatusBadge = ({ status }) => {
-  const map = {
-    PLANNING:    { bg:'rgba(59,130,246,0.1)',  color:'#3b82f6', label:'Planificación' },
-    IN_PROGRESS: { bg:'rgba(245,158,11,0.1)',  color:'#f59e0b', label:'En Progreso'   },
-    COMPLETED:   { bg:'rgba(16,185,129,0.1)',  color:'#10b981', label:'Completado'    },
-    ON_HOLD:     { bg:'rgba(100,116,139,0.1)', color:'#64748b', label:'En Pausa'      },
-    CANCELLED:   { bg:'rgba(239,68,68,0.1)',   color:'#ef4444', label:'Cancelado'     },
-  }
-  const cfg = map[status] || { bg:'rgba(100,116,139,0.1)', color:'#64748b', label: status }
-  return (
-    <span style={{
-      display:'inline-block', padding:'2px 10px', borderRadius:99,
-      fontSize:12, fontWeight:600, background:cfg.bg, color:cfg.color,
-    }}>
-      {cfg.label}
-    </span>
-  )
-}
-
-export const StatCard = ({ label, value, sub, accent = T.color.brand, loading }) => (
-  <div style={{
-    background:T.color.surface, border:`1px solid ${T.color.border}`,
-    borderRadius:T.radius.md, padding:'20px 24px',
-    boxShadow:T.shadow.sm, position:'relative', overflow:'hidden',
-  }}>
-    <div style={{
-      position:'absolute', top:0, left:0, width:4,
-      height:'100%', background:accent, borderRadius:'4px 0 0 4px',
-    }}/>
-    <p style={{ margin:0, fontSize:12, fontWeight:600, color:T.color.textMuted,
-                textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</p>
-    {loading
-      ? <div style={{ marginTop:12 }}><Spinner size={24} color={accent}/></div>
-      : (
-        <>
-          <p style={{ margin:'8px 0 4px', fontSize:32, fontWeight:700,
-                      color:T.color.textPrimary, lineHeight:1 }}>{value ?? '—'}</p>
-          {sub && <p style={{ margin:0, fontSize:13, color:T.color.textMuted }}>{sub}</p>}
-        </>
-      )
-    }
-  </div>
-)
-
-/** Modal overlay */
-export const Modal = ({ title, onClose, children, width = '520px' }) => (
-  <div style={{
-    position:'fixed', inset:0, background:'rgba(15,23,42,0.55)',
-    display:'flex', alignItems:'center', justifyContent:'center',
-    zIndex:1000, padding:16,
-  }}>
-    <div style={{
-      background:T.color.surface, borderRadius:T.radius.lg,
-      border:`1px solid ${T.color.border}`, width, maxWidth:'100%',
-      maxHeight:'90vh', overflowY:'auto', padding:28,
-      boxShadow:T.shadow.lg,
-    }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
-        <h3 style={{ margin:0, fontSize:17, fontWeight:700, color:T.color.textPrimary }}>{title}</h3>
-        <button onClick={onClose} style={{
-          background:'none', border:'none', color:T.color.textMuted,
-          fontSize:22, cursor:'pointer', lineHeight:1, padding:'2px 6px',
-        }}>×</button>
-      </div>
-      {children}
-    </div>
-  </div>
-)
-
-export const Btn = ({ children, onClick, type = 'button', disabled, variant = 'primary' }) => {
-  const vs = {
-    primary: { background:T.color.brand,   color:'#fff'                  },
-    danger:  { background:T.color.error,   color:'#fff'                  },
-    ghost:   { background:'transparent',   color:T.color.textSecondary,
-               border:`1px solid ${T.color.border}`                      },
-    success: { background:T.color.success, color:'#fff'                  },
-  }
-  return (
-    <button type={type} onClick={onClick} disabled={disabled} style={{
-      ...vs[variant],
-      padding:'7px 16px', borderRadius:T.radius.sm,
-      border: vs[variant].border || 'none',
-      fontSize:13, fontWeight:600,
-      cursor: disabled ? 'not-allowed' : 'pointer',
-      opacity: disabled ? 0.55 : 1,
-      transition:'opacity .15s',
-    }}>
-      {children}
-    </button>
-  )
-}
-
-export const FieldRow = ({ label, children }) => (
-  <div style={{ marginBottom:14 }}>
-    <label style={{ display:'block', fontSize:12, fontWeight:600,
-                    color:T.color.textMuted, marginBottom:5,
-                    textTransform:'uppercase', letterSpacing:'0.05em' }}>
-      {label}
-    </label>
-    {children}
-  </div>
-)
-
-export const TextInput = ({ value, onChange, placeholder, type = 'text' }) => (
-  <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={{
-    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
-    border:`1px solid ${T.color.border}`, fontSize:14,
-    color:T.color.textPrimary, background:T.color.surface,
-    outline:'none', boxSizing:'border-box',
-  }}/>
-)
-
-export const SelectInput = ({ value, onChange, options, placeholder }) => (
-  <select value={value} onChange={onChange} style={{
-    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
-    border:`1px solid ${T.color.border}`, fontSize:14,
-    color:T.color.textPrimary, background:T.color.surface,
-    outline:'none', boxSizing:'border-box', cursor:'pointer',
-  }}>
-    {placeholder && <option value="">{placeholder}</option>}
-    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-  </select>
-)
-
-export const ErrorBanner = ({ message, onRetry }) => (
-  <div style={{
-    padding:'10px 16px', borderRadius:T.radius.sm,
-    background:'rgba(239,68,68,0.06)', border:`1px solid rgba(239,68,68,0.2)`,
-    color:T.color.error, fontSize:13, marginBottom:16,
-    display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
-  }}>
-    <span>⚠ {message}</span>
-    {onRetry && <Btn onClick={onRetry} variant="ghost">Reintentar</Btn>}
-  </div>
-)
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/KpiView.jsx">
-import { useState, useEffect } from 'react'
-import { getSummary } from '../../services/analiticaService.js'
-import { T } from './tokens.js'
-import { Spinner, StatCard, StatusBadge, ErrorBanner } from './atoms.jsx'
-
-export default function KpiView() {
-  const [summary, setSummary] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error,   setError]   = useState(null)
-
-  const fetchSummary = async () => {
-    setLoading(true); setError(null)
-    try { setSummary(await getSummary()) }
-    catch (err) { setError(err?.message || 'Error cargando métricas') }
-    finally { setLoading(false) }   // BUG 2 FIX
-  }
-
-  useEffect(() => { fetchSummary() }, [])
-
-  return (
-    <div>
-      <div style={{ marginBottom:28 }}>
-        <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Métricas y KPIs</h1>
-        <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>
-          Indicadores de desempeño organizacional en tiempo real.
-        </p>
-      </div>
-
-      {error && <ErrorBanner message={error} onRetry={fetchSummary}/>}
-
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:28 }}>
-        <StatCard label="Total proyectos"     value={summary?.totalProjects}    loading={loading} accent={T.color.brand}   />
-        <StatCard label="Completitud prom."   value={summary ? `${(summary.averageCompletion??0).toFixed(1)}%` : null}
-                  loading={loading} accent={T.color.success}/>
-        <StatCard label="Proyectos activos"   value={summary?.activeProjects}   loading={loading} accent={T.color.warning} />
-        <StatCard label="Completados"         value={summary?.completedProjects} loading={loading} accent={T.color.info}   />
-      </div>
-
-      {!loading && summary?.metrics?.length > 0 && (
-        <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
-                      borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
-          <div style={{ padding:'14px 24px', borderBottom:`1px solid ${T.color.border}` }}>
-            <span style={{ fontWeight:600, fontSize:15, color:T.color.textPrimary }}>Métricas por Proyecto</span>
-          </div>
-          <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse' }}>
-              <thead>
-                <tr style={{ background:T.color.bg }}>
-                  {['Proyecto','Estado','Completitud','Tareas Activas','Última Actualización'].map(h => (
-                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
-                                         fontWeight:600, color:T.color.textMuted,
-                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {summary.metrics.map((m, i) => (
-                  <tr key={m.projectId} style={{
-                    borderTop:`1px solid ${T.color.border}`,
-                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
-                  }}>
-                    <td style={{ padding:'11px 16px', fontWeight:500, color:T.color.textPrimary }}>#{m.projectId}</td>
-                    <td style={{ padding:'11px 16px' }}><StatusBadge status={m.projectStatus}/></td>
-                    <td style={{ padding:'11px 16px' }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-                        <div style={{ flex:1, height:6, background:T.color.bg, borderRadius:99, overflow:'hidden' }}>
-                          <div style={{
-                            height:'100%', borderRadius:99,
-                            width:`${m.completionPercentage ?? 0}%`,
-                            background: (m.completionPercentage??0)>=80 ? T.color.success
-                                      : (m.completionPercentage??0)>=40 ? T.color.warning
-                                      : T.color.error,
-                          }}/>
-                        </div>
-                        <span style={{ fontSize:13, fontWeight:600, minWidth:36 }}>
-                          {(m.completionPercentage??0).toFixed(0)}%
-                        </span>
-                      </div>
-                    </td>
-                    <td style={{ padding:'11px 16px', color:T.color.textSecondary }}>{m.activeTasks}</td>
-                    <td style={{ padding:'11px 16px', color:T.color.textMuted, fontSize:12 }}>
-                      {m.lastUpdated ? new Date(m.lastUpdated).toLocaleDateString('es-CL') : '—'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/NotificationsView.jsx">
-import { useState, useEffect, useCallback } from 'react'
-import { getProjects } from '../../services/projectService.js'
-import { getNotifications, markAsRead } from '../../services/notifService.js'
-import { T } from './tokens.js'
-import { Spinner } from './atoms.jsx'
-
-export default function NotificationsView() {
-  const [projects,       setProjects]       = useState([])
-  const [selectedId,     setSelectedId]     = useState(null)
-  const [notifications,  setNotifications]  = useState([])
-  const [loadingProj,    setLoadingProj]    = useState(true)
-  const [loadingNotif,   setLoadingNotif]   = useState(false)
-
-  useEffect(() => {
-    getProjects()
-      .then(data => {
-        const list = Array.isArray(data) ? data : []
-        setProjects(list)
-        if (list.length > 0) setSelectedId(list[0].id)
-      })
-      .catch(() => {})
-      .finally(() => setLoadingProj(false))   // BUG 2 FIX
-  }, [])
-
-  useEffect(() => {
-    if (!selectedId) return
-    setLoadingNotif(true)
-    getNotifications(selectedId)
-      .then(d => setNotifications(Array.isArray(d) ? d : []))
-      .catch(() => setNotifications([]))
-      .finally(() => setLoadingNotif(false))   // BUG 2 FIX
-  }, [selectedId])
-
-  const handleMarkRead = useCallback(async (id) => {
-    await markAsRead(id).catch(() => {})
-    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read:true } : n))
-  }, [])
-
-  const unreadCount = notifications.filter(n => !n.read).length
-
-  return (
-    <div>
-      <div style={{ marginBottom:28 }}>
-        <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Notificaciones</h1>
-        <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>
-          Alertas generadas por eventos en los proyectos.
-        </p>
-      </div>
-
-      {/* Selector de proyecto */}
-      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
-                    borderRadius:T.radius.md, padding:'16px 24px',
-                    boxShadow:T.shadow.sm, marginBottom:20,
-                    display:'flex', alignItems:'center', gap:16 }}>
-        <label style={{ fontSize:14, fontWeight:600, color:T.color.textPrimary, whiteSpace:'nowrap' }}>Proyecto:</label>
-        {loadingProj ? <Spinner size={18}/> : (
-          <select
-            value={selectedId || ''}
-            onChange={e => setSelectedId(Number(e.target.value))}
-            style={{
-              flex:1, maxWidth:360, padding:'8px 12px', borderRadius:T.radius.sm,
-              border:`1px solid ${T.color.border}`, fontSize:14,
-              color:T.color.textPrimary, background:T.color.surface, outline:'none', cursor:'pointer',
-            }}
-          >
-            {projects.length === 0
-              ? <option value="">Sin proyectos disponibles</option>
-              : projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)
-            }
-          </select>
-        )}
-        {unreadCount > 0 && (
-          <span style={{
-            background:T.color.error, color:'#fff', borderRadius:99,
-            fontSize:12, fontWeight:700, padding:'2px 9px',
-          }}>
-            {unreadCount} sin leer
-          </span>
-        )}
-      </div>
-
-      {/* Lista */}
-      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
-                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
-        {loadingNotif ? (
-          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
-        ) : notifications.length === 0 ? (
-          <div style={{ padding:48, textAlign:'center' }}>
-            <div style={{ fontSize:36, marginBottom:12 }}>🔔</div>
-            <p style={{ color:T.color.textMuted, fontSize:14, margin:0 }}>
-              No hay notificaciones para este proyecto.
-            </p>
-          </div>
-        ) : (
-          <ul style={{ margin:0, padding:0, listStyle:'none' }}>
-            {notifications.map((n, i) => (
-              <li key={n.id} style={{
-                padding:'14px 24px', borderTop: i>0 ? `1px solid ${T.color.border}` : 'none',
-                display:'flex', alignItems:'flex-start', gap:14,
-                background: n.read ? T.color.surface : `${T.color.brand}08`,
-              }}>
-                <div style={{
-                  width:9, height:9, borderRadius:'50%', marginTop:5, flexShrink:0,
-                  background: n.read ? T.color.border : T.color.brand,
-                }}/>
-                <div style={{ flex:1 }}>
-                  <p style={{ margin:0, fontSize:14, color:T.color.textPrimary, lineHeight:1.5 }}>{n.message}</p>
-                  <p style={{ margin:'3px 0 0', fontSize:12, color:T.color.textMuted }}>
-                    {n.createdAt ? new Date(n.createdAt).toLocaleString('es-CL') : ''}
-                  </p>
-                </div>
-                {!n.read && (
-                  <button onClick={() => handleMarkRead(n.id)} style={{
-                    background:'transparent', border:`1px solid ${T.color.border}`,
-                    borderRadius:T.radius.sm, padding:'4px 12px', fontSize:12,
-                    color:T.color.textSecondary, cursor:'pointer', whiteSpace:'nowrap',
-                  }}>
-                    Marcar leída
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-    </div>
-  )
-}
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/ProjectsView.jsx">
-import { useState, useEffect, useCallback } from 'react'
-import { useAuth } from '../../context/AuthContext.jsx'
-import {
-  getProjects, createProject, updateProject, deleteProject,
-  updateProjectStatus, assignEmployee, unassignEmployee,
-  getNotes, addNote, reviewNote,
-} from '../../services/projectService.js'
-import { getEmployees } from '../../services/authService.js'
-import { T } from './tokens.js'
-import { Spinner, StatusBadge, StatCard, Modal, Btn, FieldRow, TextInput, SelectInput, ErrorBanner } from './atoms.jsx'
-
-const TYPES    = ['SOFTWARE', 'CONSULTING', 'INFRASTRUCTURE']
-const STATUSES = ['PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED']
-const STATUS_LABELS = {
-  PLANNING:'Planificación', IN_PROGRESS:'En Progreso',
-  ON_HOLD:'En Pausa', COMPLETED:'Completado', CANCELLED:'Cancelado',
-}
-
-export default function ProjectsView({ user }) {
-  const isAdmin   = user?.role === 'ADMIN'
-  const isManager = user?.role === 'MANAGER' || isAdmin
-
-  const [projects,     setProjects]     = useState([])
-  const [employees,    setEmployees]    = useState([])
-  const [loading,      setLoading]      = useState(true)
-  const [error,        setError]        = useState(null)
-  const [filterStatus, setFilterStatus] = useState('')
-
-  // modal: null | 'create' | 'edit' | 'assign' | 'notes'
-  const [modal,        setModal]        = useState(null)
-  const [activeProj,   setActiveProj]   = useState(null)
-  const [form,         setForm]         = useState({})
-  const [formError,    setFormError]    = useState(null)
-  const [submitting,   setSubmitting]   = useState(false)
-
-  const [notes,        setNotes]        = useState([])
-  const [notesLoading, setNotesLoading] = useState(false)
-  const [newNote,      setNewNote]      = useState('')
-
-  // ── Fetch ────────────────────────────────────────────────────────────────
-  const fetchProjects = useCallback(async () => {
-    setLoading(true); setError(null)
-    try {
-      const params = filterStatus ? { status: filterStatus } : {}
-      const data = await getProjects(params)
-      setProjects(Array.isArray(data) ? data : [])
-    } catch (err) {
-      setError(err?.message || 'Error al cargar proyectos')
-      setProjects([])
-    } finally { setLoading(false) }       // BUG 2 FIX: finally garantiza que loading se apaga
-  }, [filterStatus])
-
-  useEffect(() => { fetchProjects() }, [fetchProjects])
-
-  const fetchEmployees = async () => {
-    try { setEmployees(Array.isArray(await getEmployees()) ? await getEmployees() : []) }
-    catch { setEmployees([]) }
-  }
-
-  const fetchNotes = async (projectId) => {
-    setNotesLoading(true)
-    try { setNotes(Array.isArray(await getNotes(projectId)) ? await getNotes(projectId) : []) }
-    catch { setNotes([]) }
-    finally { setNotesLoading(false) }
-  }
-
-  // ── Modal helpers ────────────────────────────────────────────────────────
-  const closeModal = () => { setModal(null); setActiveProj(null); setFormError(null); setForm({}) }
-
-  const openCreate = () => {
-    setForm({ name:'', description:'', type:'SOFTWARE', managerId: user?.id ?? '' })
-    setFormError(null); setModal('create')
-  }
-
-  const openEdit = (p) => {
-    setActiveProj(p)
-    setForm({ name:p.name||'', description:p.description||'', type:p.type||'SOFTWARE' })
-    setFormError(null); setModal('edit')
-  }
-
-  const openAssign = async (p) => {
-    setActiveProj(p)
-    setForm({ employeeId: p.assignedUserId ?? '' })
-    setFormError(null)
-    await fetchEmployees()
-    setModal('assign')
-  }
-
-  const openNotes = async (p) => {
-    setActiveProj(p); setNewNote('')
-    await fetchNotes(p.id); setModal('notes')
-  }
-
-  // ── Submit handlers ──────────────────────────────────────────────────────
-  const withSubmit = (fn) => async (e) => {
-    e?.preventDefault(); setSubmitting(true); setFormError(null)
-    try { await fn(); closeModal(); fetchProjects() }
-    catch (err) { setFormError(err?.message || 'Error') }
-    finally { setSubmitting(false) }
-  }
-
-  const handleCreate     = withSubmit(() => createProject(form))
-  const handleEdit       = withSubmit(() => updateProject(activeProj.id, form))
-  const handleDelete = async (p) => {
-    if (!window.confirm(`¿Eliminar "${p.name}"?`)) return
-    try { await deleteProject(p.id); fetchProjects() } catch { /* silent */ }
-  }
-  const handleStatusChange = async (p, st) => {
-    try { await updateProjectStatus(p.id, st); fetchProjects() } catch { /* silent */ }
-  }
-  const handleAssign = withSubmit(async () => {
-    if (form.employeeId) {
-      const emp = employees.find(e => String(e.id) === String(form.employeeId))
-      await assignEmployee(activeProj.id, form.employeeId, emp?.name ?? '')
-    } else {
-      await unassignEmployee(activeProj.id)
-    }
-  })
-  const handleAddNote = async (e) => {
-    e.preventDefault()
-    if (!newNote.trim()) return
-    setSubmitting(true)
-    try { await addNote(activeProj.id, newNote.trim()); setNewNote(''); await fetchNotes(activeProj.id) }
-    catch { /* silent */ } finally { setSubmitting(false) }
-  }
-  const handleReviewNote = async (noteId, status) => {
-    try { await reviewNote(activeProj.id, noteId, { status, reviewComment:'' }); await fetchNotes(activeProj.id) }
-    catch { /* silent */ }
-  }
-
-  const setF = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
-
-  const stats = {
-    total:      projects.length,
-    inProgress: projects.filter(p => p.status === 'IN_PROGRESS').length,
-    completed:  projects.filter(p => p.status === 'COMPLETED').length,
-    planning:   projects.filter(p => p.status === 'PLANNING').length,
-  }
-
-  const inputStyle = {
-    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
-    border:`1px solid ${T.color.border}`, fontSize:14,
-    color:T.color.textPrimary, background:T.color.surface,
-    outline:'none', boxSizing:'border-box',
-  }
-
-  return (
-    <div>
-      {/* Header row */}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24, flexWrap:'wrap', gap:12 }}>
-        <div>
-          <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Gestión de Proyectos</h1>
-          <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>Planificación, ejecución y seguimiento.</p>
-        </div>
-        <div style={{ display:'flex', gap:10, alignItems:'center', flexWrap:'wrap' }}>
-          <select
-            value={filterStatus}
-            onChange={e => setFilterStatus(e.target.value)}
-            style={{ ...inputStyle, width:'auto' }}
-          >
-            <option value="">Todos los estados</option>
-            {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
-          </select>
-          {isManager && (
-            <button onClick={openCreate} style={{
-              background:T.color.brand, color:'#fff', border:'none',
-              padding:'8px 16px', borderRadius:T.radius.sm, fontSize:13, fontWeight:600, cursor:'pointer',
-            }}>
-              + Nuevo Proyecto
-            </button>
-          )}
-          <button onClick={fetchProjects} style={{
-            background:'transparent', color:T.color.textSecondary,
-            border:`1px solid ${T.color.border}`, padding:'8px 14px',
-            borderRadius:T.radius.sm, fontSize:13, cursor:'pointer',
-          }}>
-            ↺ Actualizar
-          </button>
-        </div>
-      </div>
-
-      {/* KPI cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:24 }}>
-        <StatCard label="Total"        value={stats.total}      loading={loading} accent={T.color.brand}   />
-        <StatCard label="En progreso"  value={stats.inProgress} loading={loading} accent={T.color.warning} />
-        <StatCard label="Completados"  value={stats.completed}  loading={loading} accent={T.color.success} />
-        <StatCard label="Planificación"value={stats.planning}   loading={loading} accent={T.color.info}    />
-      </div>
-
-      {error && <ErrorBanner message={error} onRetry={fetchProjects}/>}
-
-      {/* Table */}
-      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
-                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
-        {loading ? (
-          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
-        ) : projects.length === 0 ? (
-          <div style={{ padding:48, textAlign:'center', color:T.color.textMuted }}>
-            <div style={{ fontSize:36, marginBottom:10 }}>📂</div>
-            No hay proyectos{filterStatus ? ` con estado "${STATUS_LABELS[filterStatus]}"` : ''}.
-          </div>
-        ) : (
-          <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse' }}>
-              <thead>
-                <tr style={{ background:T.color.bg }}>
-                  {['#','Nombre','Tipo','Estado','Asignado a','Acciones'].map(h => (
-                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
-                                         fontWeight:600, color:T.color.textMuted,
-                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map((p, i) => (
-                  <tr key={p.id} style={{
-                    borderTop:`1px solid ${T.color.border}`,
-                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
-                  }}>
-                    <td style={{ padding:'11px 16px', color:T.color.textMuted, fontSize:13 }}>#{p.id}</td>
-                    <td style={{ padding:'11px 16px', fontWeight:600, color:T.color.textPrimary, fontSize:14 }}>{p.name}</td>
-                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{p.type}</td>
-                    <td style={{ padding:'11px 16px' }}>
-                      {isManager ? (
-                        <select
-                          value={p.status}
-                          onChange={e => handleStatusChange(p, e.target.value)}
-                          style={{ ...inputStyle, width:'auto', padding:'3px 8px', fontSize:12, fontWeight:600 }}
-                        >
-                          {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
-                        </select>
-                      ) : (
-                        <StatusBadge status={p.status}/>
-                      )}
-                    </td>
-                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>
-                      {p.assignedUserName || <span style={{ fontStyle:'italic' }}>Sin asignar</span>}
-                    </td>
-                    <td style={{ padding:'11px 16px' }}>
-                      <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-                        <Btn onClick={() => openNotes(p)} variant="ghost">📋 Notas</Btn>
-                        {isManager && (
-                          <>
-                            <Btn onClick={() => openEdit(p)} variant="ghost">✏ Editar</Btn>
-                            <Btn onClick={() => openAssign(p)} variant="ghost">👤 Asignar</Btn>
-                          </>
-                        )}
-                        {isAdmin && <Btn onClick={() => handleDelete(p)} variant="danger">🗑</Btn>}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* ── Modal Crear ──────────────────────────────────────────────────────── */}
-      {modal === 'create' && (
-        <Modal title="Nuevo Proyecto" onClose={closeModal}>
-          <form onSubmit={handleCreate}>
-            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre del proyecto"/></FieldRow>
-            <FieldRow label="Descripción">
-              <textarea value={form.description} onChange={setF('description')} rows={3}
-                style={{ ...inputStyle, resize:'vertical' }} placeholder="Descripción opcional"/>
-            </FieldRow>
-            <FieldRow label="Tipo *">
-              <SelectInput value={form.type} onChange={setF('type')} options={TYPES.map(t => ({ value:t, label:t }))}/>
-            </FieldRow>
-            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
-            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
-              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
-              <Btn type="submit" disabled={submitting}>{submitting ? 'Creando…' : 'Crear Proyecto'}</Btn>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* ── Modal Editar ─────────────────────────────────────────────────────── */}
-      {modal === 'edit' && activeProj && (
-        <Modal title={`Editar: ${activeProj.name}`} onClose={closeModal}>
-          <form onSubmit={handleEdit}>
-            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre"/></FieldRow>
-            <FieldRow label="Descripción">
-              <textarea value={form.description} onChange={setF('description')} rows={3}
-                style={{ ...inputStyle, resize:'vertical' }}/>
-            </FieldRow>
-            <FieldRow label="Tipo">
-              <SelectInput value={form.type} onChange={setF('type')} options={TYPES.map(t => ({ value:t, label:t }))}/>
-            </FieldRow>
-            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
-            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
-              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
-              <Btn type="submit" disabled={submitting}>{submitting ? 'Guardando…' : 'Guardar'}</Btn>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* ── Modal Asignar ────────────────────────────────────────────────────── */}
-      {modal === 'assign' && activeProj && (
-        <Modal title={`Asignar empleado — ${activeProj.name}`} onClose={closeModal} width="420px">
-          <form onSubmit={handleAssign}>
-            <FieldRow label="Empleado">
-              <SelectInput
-                value={form.employeeId}
-                onChange={setF('employeeId')}
-                placeholder="Sin asignar"
-                options={employees.map(e => ({ value: e.id, label: `${e.name || e.email}` }))}
-              />
-            </FieldRow>
-            <p style={{ color:T.color.textMuted, fontSize:12, margin:'0 0 16px' }}>
-              Selecciona "Sin asignar" para retirar la asignación actual.
-            </p>
-            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
-            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
-              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
-              <Btn type="submit" disabled={submitting}>{submitting ? 'Guardando…' : 'Confirmar'}</Btn>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {/* ── Modal Notas ──────────────────────────────────────────────────────── */}
-      {modal === 'notes' && activeProj && (
-        <Modal title={`Notas — ${activeProj.name}`} onClose={closeModal} width="600px">
-          {notesLoading ? (
-            <div style={{ padding:24, display:'flex', justifyContent:'center' }}><Spinner/></div>
-          ) : notes.length === 0 ? (
-            <p style={{ color:T.color.textMuted, textAlign:'center', fontStyle:'italic', margin:'8px 0 20px' }}>
-              Sin notas de avance.
-            </p>
-          ) : (
-            <div style={{ maxHeight:320, overflowY:'auto', marginBottom:20 }}>
-              {notes.map(n => (
-                <div key={n.id} style={{
-                  background:T.color.bg, borderRadius:T.radius.sm,
-                  border:`1px solid ${T.color.border}`, padding:14, marginBottom:10,
-                }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
-                    <span style={{ color:T.color.textMuted, fontSize:12 }}>
-                      {n.authorName || `#${n.authorId}`} · {n.createdAt ? new Date(n.createdAt).toLocaleDateString('es-CL') : ''}
-                    </span>
-                    <StatusBadge status={n.status === 'APPROVED' ? 'COMPLETED' : n.status === 'REJECTED' ? 'CANCELLED' : 'PLANNING'}/>
-                  </div>
-                  <p style={{ color:T.color.textPrimary, margin:'0 0 8px', fontSize:14 }}>{n.content}</p>
-                  {n.reviewComment && (
-                    <p style={{ color:T.color.textMuted, fontSize:12, fontStyle:'italic', margin:'0 0 8px' }}>
-                      Revisión: {n.reviewComment}
-                    </p>
-                  )}
-                  {isManager && n.status === 'PENDING' && (
-                    <div style={{ display:'flex', gap:8 }}>
-                      <Btn onClick={() => handleReviewNote(n.id, 'APPROVED')} variant="success">✓ Aprobar</Btn>
-                      <Btn onClick={() => handleReviewNote(n.id, 'REJECTED')} variant="danger">✗ Rechazar</Btn>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-          <div style={{ borderTop:`1px solid ${T.color.border}`, paddingTop:16 }}>
-            <form onSubmit={handleAddNote} style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
-              <textarea
-                value={newNote}
-                onChange={e => setNewNote(e.target.value)}
-                placeholder="Escribe una nota de avance…"
-                rows={2}
-                style={{
-                  flex:1, padding:'8px 12px', borderRadius:T.radius.sm,
-                  border:`1px solid ${T.color.border}`, fontSize:14,
-                  color:T.color.textPrimary, background:T.color.surface,
-                  resize:'none', boxSizing:'border-box',
-                }}
-              />
-              <Btn type="submit" disabled={submitting || !newNote.trim()}>
-                {submitting ? '…' : 'Agregar'}
-              </Btn>
-            </form>
-          </div>
-        </Modal>
-      )}
-    </div>
-  )
-}
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/ResourcesView.jsx">
-import { useState, useEffect, useCallback } from 'react'
-import {
-  getResources, getAvailableResources,
-  createResource, deleteResource, updateAvailability,
-} from '../../services/resourceService.js'
-import { T } from './tokens.js'
-import { Spinner, StatCard, Modal, Btn, FieldRow, TextInput, SelectInput, ErrorBanner } from './atoms.jsx'
-
-const DEPARTMENTS = ['Engineering', 'Design', 'QA', 'DevOps', 'Management', 'Consulting']
-const ROLES       = ['DEVELOPER', 'DESIGNER', 'QA', 'DEVOPS', 'MANAGER', 'CONSULTANT']
-
-const ROLE_COLOR = {
-  DEVELOPER:'#6366f1', DESIGNER:'#ec4899',
-  QA:'#f59e0b',        DEVOPS:'#14b8a6',
-  MANAGER:'#8b5cf6',   CONSULTANT:'#f97316',
-}
-
-export default function ResourcesView({ user }) {
-  const isAdmin = user?.role === 'ADMIN'
-
-  const [resources,  setResources]  = useState([])
-  const [available,  setAvailable]  = useState([])
-  const [loading,    setLoading]    = useState(true)
-  const [error,      setError]      = useState(null)
-  const [modal,      setModal]      = useState(null)   // null | 'create'
-  const [form,       setForm]       = useState({})
-  const [formError,  setFormError]  = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-
-  const fetchAll = useCallback(async () => {
-    setLoading(true); setError(null)
-    try {
-      const [all, avail] = await Promise.all([getResources(), getAvailableResources()])
-      setResources(Array.isArray(all) ? all : [])
-      setAvailable(Array.isArray(avail) ? avail : [])
-    } catch (err) {
-      setError(err?.message || 'Error al cargar recursos')
-      setResources([]); setAvailable([])
-    } finally { setLoading(false) }      // BUG 2 FIX: finally garantiza que loading se apaga
-  }, [])
-
-  useEffect(() => { fetchAll() }, [fetchAll])
-
-  const openCreate = () => {
-    setForm({ name:'', email:'', department: DEPARTMENTS[0], role:'DEVELOPER' })
-    setFormError(null); setModal('create')
-  }
-  const closeModal = () => { setModal(null); setFormError(null); setForm({}) }
-
-  const handleCreate = async (e) => {
-    e.preventDefault(); setSubmitting(true); setFormError(null)
-    try { await createResource(form); closeModal(); fetchAll() }
-    catch (err) { setFormError(err?.message || 'Error al crear recurso') }
-    finally { setSubmitting(false) }
-  }
-
-  const handleToggleAvailability = async (r) => {
-    try { await updateAvailability(r.id, !r.available); fetchAll() }
-    catch { /* silent */ }
-  }
-
-  const handleDelete = async (r) => {
-    if (!window.confirm(`¿Eliminar a "${r.name}"?`)) return
-    try { await deleteResource(r.id); fetchAll() }
-    catch { /* silent */ }
-  }
-
-  const setF = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
-
-  const inputStyle = {
-    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
-    border:`1px solid ${T.color.border}`, fontSize:14,
-    color:T.color.textPrimary, background:T.color.surface,
-    outline:'none', boxSizing:'border-box',
-  }
-
-  return (
-    <div>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24 }}>
-        <div>
-          <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Recursos Humanos</h1>
-          <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>Disponibilidad y asignación del equipo.</p>
-        </div>
-        <div style={{ display:'flex', gap:10 }}>
-          {isAdmin && (
-            <button onClick={openCreate} style={{
-              background:T.color.brand, color:'#fff', border:'none',
-              padding:'8px 16px', borderRadius:T.radius.sm, fontSize:13, fontWeight:600, cursor:'pointer',
-            }}>
-              + Nuevo Recurso
-            </button>
-          )}
-          <button onClick={fetchAll} style={{
-            background:'transparent', color:T.color.textSecondary,
-            border:`1px solid ${T.color.border}`, padding:'8px 14px',
-            borderRadius:T.radius.sm, fontSize:13, cursor:'pointer',
-          }}>
-            ↺ Actualizar
-          </button>
-        </div>
-      </div>
-
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:24 }}>
-        <StatCard label="Total"       value={resources.length}                     loading={loading} accent={T.color.brand}   />
-        <StatCard label="Disponibles" value={available.length}                     loading={loading} accent={T.color.success} />
-        <StatCard label="Asignados"   value={resources.length - available.length}  loading={loading} accent={T.color.warning} />
-        <StatCard label="Ocupación"
-          value={resources.length > 0 ? `${Math.round((1-available.length/resources.length)*100)}%` : '—'}
-          loading={loading} accent={T.color.info}/>
-      </div>
-
-      {error && <ErrorBanner message={error} onRetry={fetchAll}/>}
-
-      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
-                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
-        {loading ? (
-          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
-        ) : resources.length === 0 ? (
-          <div style={{ padding:48, textAlign:'center', color:T.color.textMuted }}>
-            <div style={{ fontSize:36, marginBottom:10 }}>👥</div>
-            No hay recursos registrados.
-          </div>
-        ) : (
-          <div style={{ overflowX:'auto' }}>
-            <table style={{ width:'100%', borderCollapse:'collapse' }}>
-              <thead>
-                <tr style={{ background:T.color.bg }}>
-                  {['Nombre','Email','Departamento','Rol','Estado','Acciones'].map(h => (
-                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
-                                         fontWeight:600, color:T.color.textMuted,
-                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
-                      {h}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {resources.map((r, i) => (
-                  <tr key={r.id} style={{
-                    borderTop:`1px solid ${T.color.border}`,
-                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
-                  }}>
-                    <td style={{ padding:'11px 16px', fontWeight:600, color:T.color.textPrimary, fontSize:14 }}>{r.name}</td>
-                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{r.email}</td>
-                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{r.department}</td>
-                    <td style={{ padding:'11px 16px' }}>
-                      <span style={{
-                        display:'inline-block', padding:'2px 10px', borderRadius:99,
-                        fontSize:12, fontWeight:600,
-                        background:`${ROLE_COLOR[r.role]||T.color.brand}18`,
-                        color: ROLE_COLOR[r.role] || T.color.brand,
-                      }}>
-                        {r.role}
-                      </span>
-                    </td>
-                    <td style={{ padding:'11px 16px' }}>
-                      <span style={{
-                        display:'inline-flex', alignItems:'center', gap:6,
-                        fontSize:13, fontWeight:500,
-                        color: r.available ? T.color.success : T.color.warning,
-                      }}>
-                        <span style={{
-                          width:8, height:8, borderRadius:'50%',
-                          background: r.available ? T.color.success : T.color.warning,
-                        }}/>
-                        {r.available ? 'Disponible' : 'Asignado'}
-                      </span>
-                    </td>
-                    <td style={{ padding:'11px 16px' }}>
-                      <div style={{ display:'flex', gap:6 }}>
-                        {isAdmin && (
-                          <>
-                            <Btn onClick={() => handleToggleAvailability(r)} variant="ghost">
-                              {r.available ? '🔒 Asignar' : '🔓 Liberar'}
-                            </Btn>
-                            <Btn onClick={() => handleDelete(r)} variant="danger">🗑</Btn>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Modal Crear Recurso */}
-      {modal === 'create' && (
-        <Modal title="Nuevo Recurso" onClose={closeModal}>
-          <form onSubmit={handleCreate}>
-            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre completo"/></FieldRow>
-            <FieldRow label="Email *"><TextInput value={form.email} onChange={setF('email')} placeholder="correo@empresa.cl" type="email"/></FieldRow>
-            <FieldRow label="Departamento">
-              <SelectInput value={form.department} onChange={setF('department')}
-                options={DEPARTMENTS.map(d => ({ value:d, label:d }))}/>
-            </FieldRow>
-            <FieldRow label="Rol">
-              <SelectInput value={form.role} onChange={setF('role')}
-                options={ROLES.map(r => ({ value:r, label:r }))}/>
-            </FieldRow>
-            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
-            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
-              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
-              <Btn type="submit" disabled={submitting}>{submitting ? 'Creando…' : 'Crear Recurso'}</Btn>
-            </div>
-          </form>
-        </Modal>
-      )}
-    </div>
-  )
-}
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/tokens.js">
-/** Design tokens compartidos entre todas las vistas del Dashboard. */
-export const T = {
-  sidebar: { width: 248 },
-  header:  { height: 64 },
-  color: {
-    sidebarBg:        '#0f172a',
-    sidebarBorder:    'rgba(255,255,255,0.06)',
-    sidebarText:      '#64748b',
-    sidebarTextHover: '#cbd5e1',
-    sidebarActive:    '#a5b4fc',
-    sidebarActiveBg:  'rgba(99,102,241,0.14)',
-    sidebarActiveBar: '#6366f1',
-    sidebarHover:     'rgba(255,255,255,0.04)',
-    brand:            '#6366f1',
-    brandDark:        '#4f46e5',
-    brandLight:       '#e0e7ff',
-    bg:               '#f1f5f9',
-    surface:          '#ffffff',
-    border:           '#e2e8f0',
-    borderSoft:       '#f1f5f9',
-    textPrimary:      '#0f172a',
-    textSecondary:    '#475569',
-    textMuted:        '#94a3b8',
-    success:          '#10b981',
-    warning:          '#f59e0b',
-    error:            '#ef4444',
-    info:             '#3b82f6',
-    roleAdmin:    { bg:'rgba(124,58,237,0.1)',  color:'#7c3aed', border:'rgba(124,58,237,0.25)' },
-    roleManager:  { bg:'rgba(8,145,178,0.1)',   color:'#0891b2', border:'rgba(8,145,178,0.25)'  },
-    roleEmployee: { bg:'rgba(5,150,105,0.1)',   color:'#059669', border:'rgba(5,150,105,0.25)'  },
-  },
-  shadow: {
-    sm: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
-    md: '0 4px 12px rgba(0,0,0,0.08)',
-    lg: '0 10px 30px rgba(0,0,0,0.12)',
-  },
-  radius: { sm:'6px', md:'10px', lg:'16px' },
-}
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/services/analiticaService.js">
-import api, { call } from './api.js'
-
-const BASE = '/api/v1/analitica'
-
-export const getAllMetrics     = ()          => call(() => api.get(`${BASE}/metricas`).then(r => r.data))
-export const getProjectMetrics = (projectId) => call(() => api.get(`${BASE}/metricas/proyecto/${projectId}`).then(r => r.data))
-export const getSummary        = ()          => call(() => api.get(`${BASE}/resumen`).then(r => r.data))
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/services/api.js">
-/**
- * Centralized Axios instance.
- * ROOT CAUSE BUG 2: los servicios usaban localStorage.getItem('token')
- * pero AuthContext persiste con clave 'innovatech_token'.
- * Este interceptor unifica la clave y añade timeout para evitar spinners infinitos.
- */
-import axios from 'axios'
-
-const TOKEN_KEY = 'innovatech_token'
-
-const api = axios.create({
-  timeout: 10000, // 10 s — previene loading infinito si el BFF no responde
-})
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY)
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
-
-/** Normaliza cualquier error de Axios en un objeto {message, status} */
-export function parseError(err) {
-  if (err.response) {
-    const msg = err.response.data?.message || err.response.data?.error || 'Error del servidor'
-    return { message: msg, status: err.response.status }
-  }
-  if (err.request) return { message: 'No se pudo conectar con el servidor', status: 0 }
-  return { message: err.message || 'Error inesperado', status: -1 }
-}
-
-/** Wrapper que normaliza errores y garantiza que siempre lanza {message,status} */
-export async function call(fn) {
-  try {
-    return await fn()
-  } catch (err) {
-    throw parseError(err)
-  }
-}
-
-export default api
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/services/notifService.js">
-import api, { call } from './api.js'
-
-const BASE = '/api/v1/notificaciones'
-
-export const getNotifications      = (projectId)      => call(() => api.get(`${BASE}/proyecto/${projectId}`).then(r => r.data))
-export const getUnreadNotifications= (projectId)      => call(() => api.get(`${BASE}/proyecto/${projectId}/no-leidas`).then(r => r.data))
-export const markAsRead            = (notificationId) => call(() => api.patch(`${BASE}/${notificationId}/read`, {}))
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/src/services/resourceService.js">
-import api, { call } from './api.js'
-
-const BASE = '/api/resources'
-
-export const getResources           = ()                          => call(() => api.get(`${BASE}/`).then(r => r.data))
-export const getAvailableResources  = ()                          => call(() => api.get(`${BASE}/available`).then(r => r.data))
-export const getResourcesByDepartment=(dept)                      => call(() => api.get(`${BASE}/department/${encodeURIComponent(dept)}`).then(r => r.data))
-export const getResourceById        = (id)                        => call(() => api.get(`${BASE}/${id}`).then(r => r.data))
-export const createResource         = (data)                      => call(() => api.post(`${BASE}/`, data).then(r => r.data))
-export const updateAvailability     = (id, available)             => call(() => api.patch(`${BASE}/${id}/availability`, { available }).then(r => r.data))
-export const assignResourceToProject= (id, projectId, projectName)=> call(() => api.patch(`${BASE}/${id}/assign`, { projectId, projectName }).then(r => r.data))
-export const deleteResource         = (id)                        => call(() => api.delete(`${BASE}/${id}`))
-</file>
-
-<file path=".github/workflows/frontend-ci.yml">
-name: Frontend CI Pipeline
-
-on:
-  push:
-    branches: [ "main", "master" ]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20.x'
-        cache: 'npm'
-    - name: Install dependencies
-      run: npm ci
-    - name: Run Vitest
-      run: npm run test -- --run
 </file>
 
 <file path="CodigosTest_Backend&Frontend/AuthServiceTest.java">
@@ -2644,18 +1538,6 @@ export default function App() {
 }
 </file>
 
-<file path="innovatech-frontend-valdes-munoz/src/components/PrivateRoute.jsx">
-import { Navigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-
-/** Guarda de ruta: redirige a /login si no hay sesión activa. */
-export default function PrivateRoute({ children }) {
-  const { isAuthenticated, isLoading } = useAuth()
-  if (isLoading) return null
-  return isAuthenticated ? children : <Navigate to="/login" replace />
-}
-</file>
-
 <file path="innovatech-frontend-valdes-munoz/src/context/AuthContext.jsx">
 /**
  * AuthContext — Patrón Observer con React Context + useReducer.
@@ -2770,218 +1652,1031 @@ createRoot(document.getElementById('root')).render(
 )
 </file>
 
-<file path="innovatech-frontend-valdes-munoz/src/pages/DashboardPage.jsx">
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext.jsx'
-import { T } from './dashboard/tokens.js'
-import ProjectsView      from './dashboard/ProjectsView.jsx'
-import ResourcesView     from './dashboard/ResourcesView.jsx'
-import KpiView           from './dashboard/KpiView.jsx'
-import NotificationsView from './dashboard/NotificationsView.jsx'
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/atoms.jsx">
+import { useState } from 'react'
+import { T } from './tokens.js'
 
-const NAV_ITEMS = [
-  {
-    id:'proyectos', label:'Proyectos', roles:['ADMIN','MANAGER','EMPLOYEE'],
-    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path d="M2 6a2 2 0 012-2h5l2 2h9a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
-    </svg>),
-  },
-  {
-    id:'recursos', label:'Recursos Humanos', roles:['ADMIN','MANAGER'],
-    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H2v-2a4 4 0 013-3.87m12-5.13a4 4 0 11-8 0 4 4 0 018 0zM7 8a4 4 0 110 8 4 4 0 010-8z"/>
-    </svg>),
-  },
-  {
-    id:'kpis', label:'Métricas / KPIs', roles:['ADMIN','MANAGER'],
-    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/>
-    </svg>),
-  },
-  {
-    id:'notificaciones', label:'Notificaciones', roles:['ADMIN','MANAGER','EMPLOYEE'],
-    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
-      <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.993M9 17H4l1.405-1.405A2.032 2.032 0 006 14.158V11a6 6 0 016-6"/>
-      <path d="M13 21a1 1 0 01-2 0"/>
-    </svg>),
-  },
-]
+export const Spinner = ({ size = 20, color = T.color.brand }) => (
+  <div style={{
+    width: size, height: size,
+    border: `2px solid ${color}30`,
+    borderTopColor: color,
+    borderRadius: '50%',
+    animation: 'innovatech-spin 0.7s linear infinite',
+  }}/>
+)
 
-export default function DashboardPage() {
-  const { user, logout } = useAuth()
-  const navigate          = useNavigate()
-  const [activeView, setActiveView] = useState('proyectos')
+export const StatusBadge = ({ status }) => {
+  const map = {
+    PLANNING:    { bg:'rgba(59,130,246,0.1)',  color:'#3b82f6', label:'Planificación' },
+    IN_PROGRESS: { bg:'rgba(245,158,11,0.1)',  color:'#f59e0b', label:'En Progreso'   },
+    COMPLETED:   { bg:'rgba(16,185,129,0.1)',  color:'#10b981', label:'Completado'    },
+    ON_HOLD:     { bg:'rgba(100,116,139,0.1)', color:'#64748b', label:'En Pausa'      },
+    CANCELLED:   { bg:'rgba(239,68,68,0.1)',   color:'#ef4444', label:'Cancelado'     },
+  }
+  const cfg = map[status] || { bg:'rgba(100,116,139,0.1)', color:'#64748b', label: status }
+  return (
+    <span style={{
+      display:'inline-block', padding:'2px 10px', borderRadius:99,
+      fontSize:12, fontWeight:600, background:cfg.bg, color:cfg.color,
+    }}>
+      {cfg.label}
+    </span>
+  )
+}
+
+export const StatCard = ({ label, value, sub, accent = T.color.brand, loading }) => (
+  <div style={{
+    background:T.color.surface, border:`1px solid ${T.color.border}`,
+    borderRadius:T.radius.md, padding:'20px 24px',
+    boxShadow:T.shadow.sm, position:'relative', overflow:'hidden',
+  }}>
+    <div style={{
+      position:'absolute', top:0, left:0, width:4,
+      height:'100%', background:accent, borderRadius:'4px 0 0 4px',
+    }}/>
+    <p style={{ margin:0, fontSize:12, fontWeight:600, color:T.color.textMuted,
+                textTransform:'uppercase', letterSpacing:'0.06em' }}>{label}</p>
+    {loading
+      ? <div style={{ marginTop:12 }}><Spinner size={24} color={accent}/></div>
+      : (
+        <>
+          <p style={{ margin:'8px 0 4px', fontSize:32, fontWeight:700,
+                      color:T.color.textPrimary, lineHeight:1 }}>{value ?? '—'}</p>
+          {sub && <p style={{ margin:0, fontSize:13, color:T.color.textMuted }}>{sub}</p>}
+        </>
+      )
+    }
+  </div>
+)
+
+/** Modal overlay */
+export const Modal = ({ title, onClose, children, width = '520px' }) => (
+  <div style={{
+    position:'fixed', inset:0, background:'rgba(15,23,42,0.55)',
+    display:'flex', alignItems:'center', justifyContent:'center',
+    zIndex:1000, padding:16,
+  }}>
+    <div style={{
+      background:T.color.surface, borderRadius:T.radius.lg,
+      border:`1px solid ${T.color.border}`, width, maxWidth:'100%',
+      maxHeight:'90vh', overflowY:'auto', padding:28,
+      boxShadow:T.shadow.lg,
+    }}>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+        <h3 style={{ margin:0, fontSize:17, fontWeight:700, color:T.color.textPrimary }}>{title}</h3>
+        <button onClick={onClose} style={{
+          background:'none', border:'none', color:T.color.textMuted,
+          fontSize:22, cursor:'pointer', lineHeight:1, padding:'2px 6px',
+        }}>×</button>
+      </div>
+      {children}
+    </div>
+  </div>
+)
+
+export const Btn = ({ children, onClick, type = 'button', disabled, variant = 'primary' }) => {
+  const vs = {
+    primary: { background:T.color.brand,   color:'#fff'                  },
+    danger:  { background:T.color.error,   color:'#fff'                  },
+    ghost:   { background:'transparent',   color:T.color.textSecondary,
+               border:`1px solid ${T.color.border}`                      },
+    success: { background:T.color.success, color:'#fff'                  },
+  }
+  return (
+    <button type={type} onClick={onClick} disabled={disabled} style={{
+      ...vs[variant],
+      padding:'7px 16px', borderRadius:T.radius.sm,
+      border: vs[variant].border || 'none',
+      fontSize:13, fontWeight:600,
+      cursor: disabled ? 'not-allowed' : 'pointer',
+      opacity: disabled ? 0.55 : 1,
+      transition:'opacity .15s',
+    }}>
+      {children}
+    </button>
+  )
+}
+
+export const FieldRow = ({ label, children }) => (
+  <div style={{ marginBottom:14 }}>
+    <label style={{ display:'block', fontSize:12, fontWeight:600,
+                    color:T.color.textMuted, marginBottom:5,
+                    textTransform:'uppercase', letterSpacing:'0.05em' }}>
+      {label}
+    </label>
+    {children}
+  </div>
+)
+
+export const TextInput = ({ value, onChange, placeholder, type = 'text' }) => (
+  <input type={type} value={value} onChange={onChange} placeholder={placeholder} style={{
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box',
+  }}/>
+)
+
+export const SelectInput = ({ value, onChange, options, placeholder }) => (
+  <select value={value} onChange={onChange} style={{
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box', cursor:'pointer',
+  }}>
+    {placeholder && <option value="">{placeholder}</option>}
+    {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+  </select>
+)
+
+export const ErrorBanner = ({ message, onRetry }) => (
+  <div style={{
+    padding:'10px 16px', borderRadius:T.radius.sm,
+    background:'rgba(239,68,68,0.06)', border:`1px solid rgba(239,68,68,0.2)`,
+    color:T.color.error, fontSize:13, marginBottom:16,
+    display:'flex', alignItems:'center', justifyContent:'space-between', gap:12,
+  }}>
+    <span>⚠ {message}</span>
+    {onRetry && <Btn onClick={onRetry} variant="ghost">Reintentar</Btn>}
+  </div>
+)
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/KpiView.jsx">
+import { useState, useEffect } from 'react'
+import { getSummary } from '../../services/analiticaService.js'
+import { T } from './tokens.js'
+import { Spinner, StatCard, StatusBadge, ErrorBanner } from './atoms.jsx'
+
+export default function KpiView() {
+  const [summary, setSummary] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error,   setError]   = useState(null)
+
+  const fetchSummary = async () => {
+    setLoading(true); setError(null)
+    try { setSummary(await getSummary()) }
+    catch (err) { setError(err?.message || 'Error cargando métricas') }
+    finally { setLoading(false) }   // BUG 2 FIX
+  }
+
+  useEffect(() => { fetchSummary() }, [])
+
+  return (
+    <div>
+      <div style={{ marginBottom:28 }}>
+        <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Métricas y KPIs</h1>
+        <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>
+          Indicadores de desempeño organizacional en tiempo real.
+        </p>
+      </div>
+
+      {error && <ErrorBanner message={error} onRetry={fetchSummary}/>}
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:28 }}>
+        <StatCard label="Total proyectos"     value={summary?.totalProjects}    loading={loading} accent={T.color.brand}   />
+        <StatCard label="Completitud prom."   value={summary ? `${(summary.averageCompletion??0).toFixed(1)}%` : null}
+                  loading={loading} accent={T.color.success}/>
+        <StatCard label="Proyectos activos"   value={summary?.activeProjects}   loading={loading} accent={T.color.warning} />
+        <StatCard label="Completados"         value={summary?.completedProjects} loading={loading} accent={T.color.info}   />
+      </div>
+
+      {!loading && summary?.metrics?.length > 0 && (
+        <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                      borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+          <div style={{ padding:'14px 24px', borderBottom:`1px solid ${T.color.border}` }}>
+            <span style={{ fontWeight:600, fontSize:15, color:T.color.textPrimary }}>Métricas por Proyecto</span>
+          </div>
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:T.color.bg }}>
+                  {['Proyecto','Estado','Completitud','Tareas Activas','Última Actualización'].map(h => (
+                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
+                                         fontWeight:600, color:T.color.textMuted,
+                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {summary.metrics.map((m, i) => (
+                  <tr key={m.projectId} style={{
+                    borderTop:`1px solid ${T.color.border}`,
+                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
+                  }}>
+                    <td style={{ padding:'11px 16px', fontWeight:500, color:T.color.textPrimary }}>#{m.projectId}</td>
+                    <td style={{ padding:'11px 16px' }}><StatusBadge status={m.projectStatus}/></td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+                        <div style={{ flex:1, height:6, background:T.color.bg, borderRadius:99, overflow:'hidden' }}>
+                          <div style={{
+                            height:'100%', borderRadius:99,
+                            width:`${m.completionPercentage ?? 0}%`,
+                            background: (m.completionPercentage??0)>=80 ? T.color.success
+                                      : (m.completionPercentage??0)>=40 ? T.color.warning
+                                      : T.color.error,
+                          }}/>
+                        </div>
+                        <span style={{ fontSize:13, fontWeight:600, minWidth:36 }}>
+                          {(m.completionPercentage??0).toFixed(0)}%
+                        </span>
+                      </div>
+                    </td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary }}>{m.activeTasks}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textMuted, fontSize:12 }}>
+                      {m.lastUpdated ? new Date(m.lastUpdated).toLocaleDateString('es-CL') : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/NotificationsView.jsx">
+import { useState, useEffect, useCallback } from 'react'
+import { getProjects } from '../../services/projectService.js'
+import { getNotifications, markAsRead } from '../../services/notifService.js'
+import { T } from './tokens.js'
+import { Spinner } from './atoms.jsx'
+
+export default function NotificationsView() {
+  const [projects,       setProjects]       = useState([])
+  const [selectedId,     setSelectedId]     = useState(null)
+  const [notifications,  setNotifications]  = useState([])
+  const [loadingProj,    setLoadingProj]    = useState(true)
+  const [loadingNotif,   setLoadingNotif]   = useState(false)
 
   useEffect(() => {
-    if (!user) navigate('/login', { replace:true })
-  }, [user, navigate])
+    getProjects()
+      .then(data => {
+        const list = Array.isArray(data) ? data : []
+        setProjects(list)
+        if (list.length > 0) setSelectedId(list[0].id)
+      })
+      .catch(() => {})
+      .finally(() => setLoadingProj(false))   // BUG 2 FIX
+  }, [])
 
-  if (!user) return null
+  useEffect(() => {
+    if (!selectedId) return
+    setLoadingNotif(true)
+    getNotifications(selectedId)
+      .then(d => setNotifications(Array.isArray(d) ? d : []))
+      .catch(() => setNotifications([]))
+      .finally(() => setLoadingNotif(false))   // BUG 2 FIX
+  }, [selectedId])
 
-  const role        = user.role || 'EMPLOYEE'
-  const roleConfig  = T.color[`role${role[0]}${role.slice(1).toLowerCase()}`] || T.color.roleEmployee
-  const roleLabel   = { ADMIN:'Administrador', MANAGER:'Manager', EMPLOYEE:'Empleado' }[role] || role
-  const visibleItems= NAV_ITEMS.filter(it => it.roles.includes(role))
-  const currentItem = visibleItems.find(it => it.id === activeView) || visibleItems[0]
+  const handleMarkRead = useCallback(async (id) => {
+    await markAsRead(id).catch(() => {})
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read:true } : n))
+  }, [])
 
-  const handleLogout = () => { logout(); navigate('/login', { replace:true }) }
+  const unreadCount = notifications.filter(n => !n.read).length
 
-  const sidebarItemStyle = (id) => ({
-    display:'flex', alignItems:'center', gap:12,
-    padding:'10px 16px', margin:'1px 10px',
-    borderRadius:T.radius.sm,
-    cursor:'pointer', fontSize:14, fontWeight:500,
-    border:'none', width:'calc(100% - 20px)', textAlign:'left',
-    transition:'background 0.12s, color 0.12s',
-    ...(currentItem.id === id ? {
-      background:T.color.sidebarActiveBg,
-      color:T.color.sidebarActive,
-      boxShadow:`inset 3px 0 0 ${T.color.sidebarActiveBar}`,
-    } : {
-      background:'transparent',
-      color:T.color.sidebarText,
-    }),
-  })
+  return (
+    <div>
+      <div style={{ marginBottom:28 }}>
+        <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Notificaciones</h1>
+        <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>
+          Alertas generadas por eventos en los proyectos.
+        </p>
+      </div>
 
-  const renderView = () => {
-    switch (currentItem.id) {
-      case 'proyectos':      return <ProjectsView      user={user}/>
-      case 'recursos':       return <ResourcesView     user={user}/>
-      case 'kpis':           return <KpiView/>
-      case 'notificaciones': return <NotificationsView/>
-      default:               return <ProjectsView      user={user}/>
+      {/* Selector de proyecto */}
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, padding:'16px 24px',
+                    boxShadow:T.shadow.sm, marginBottom:20,
+                    display:'flex', alignItems:'center', gap:16 }}>
+        <label style={{ fontSize:14, fontWeight:600, color:T.color.textPrimary, whiteSpace:'nowrap' }}>Proyecto:</label>
+        {loadingProj ? <Spinner size={18}/> : (
+          <select
+            value={selectedId || ''}
+            onChange={e => setSelectedId(Number(e.target.value))}
+            style={{
+              flex:1, maxWidth:360, padding:'8px 12px', borderRadius:T.radius.sm,
+              border:`1px solid ${T.color.border}`, fontSize:14,
+              color:T.color.textPrimary, background:T.color.surface, outline:'none', cursor:'pointer',
+            }}
+          >
+            {projects.length === 0
+              ? <option value="">Sin proyectos disponibles</option>
+              : projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)
+            }
+          </select>
+        )}
+        {unreadCount > 0 && (
+          <span style={{
+            background:T.color.error, color:'#fff', borderRadius:99,
+            fontSize:12, fontWeight:700, padding:'2px 9px',
+          }}>
+            {unreadCount} sin leer
+          </span>
+        )}
+      </div>
+
+      {/* Lista */}
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+        {loadingNotif ? (
+          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
+        ) : notifications.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center' }}>
+            <div style={{ fontSize:36, marginBottom:12 }}>🔔</div>
+            <p style={{ color:T.color.textMuted, fontSize:14, margin:0 }}>
+              No hay notificaciones para este proyecto.
+            </p>
+          </div>
+        ) : (
+          <ul style={{ margin:0, padding:0, listStyle:'none' }}>
+            {notifications.map((n, i) => (
+              <li key={n.id} style={{
+                padding:'14px 24px', borderTop: i>0 ? `1px solid ${T.color.border}` : 'none',
+                display:'flex', alignItems:'flex-start', gap:14,
+                background: n.read ? T.color.surface : `${T.color.brand}08`,
+              }}>
+                <div style={{
+                  width:9, height:9, borderRadius:'50%', marginTop:5, flexShrink:0,
+                  background: n.read ? T.color.border : T.color.brand,
+                }}/>
+                <div style={{ flex:1 }}>
+                  <p style={{ margin:0, fontSize:14, color:T.color.textPrimary, lineHeight:1.5 }}>{n.message}</p>
+                  <p style={{ margin:'3px 0 0', fontSize:12, color:T.color.textMuted }}>
+                    {n.createdAt ? new Date(n.createdAt).toLocaleString('es-CL') : ''}
+                  </p>
+                </div>
+                {!n.read && (
+                  <button onClick={() => handleMarkRead(n.id)} style={{
+                    background:'transparent', border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.sm, padding:'4px 12px', fontSize:12,
+                    color:T.color.textSecondary, cursor:'pointer', whiteSpace:'nowrap',
+                  }}>
+                    Marcar leída
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/ProjectsView.jsx">
+import { useState, useEffect, useCallback } from 'react'
+import { useAuth } from '../../context/AuthContext.jsx'
+import {
+  getProjects, createProject, updateProject, deleteProject,
+  updateProjectStatus, assignEmployee, unassignEmployee,
+  getNotes, addNote, reviewNote,
+} from '../../services/projectService.js'
+import { getEmployees } from '../../services/authService.js'
+import { T } from './tokens.js'
+import { Spinner, StatusBadge, StatCard, Modal, Btn, FieldRow, TextInput, SelectInput, ErrorBanner } from './atoms.jsx'
+
+const TYPES    = ['SOFTWARE', 'CONSULTING', 'INFRASTRUCTURE']
+const STATUSES = ['PLANNING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED', 'CANCELLED']
+const STATUS_LABELS = {
+  PLANNING:'Planificación', IN_PROGRESS:'En Progreso',
+  ON_HOLD:'En Pausa', COMPLETED:'Completado', CANCELLED:'Cancelado',
+}
+
+export default function ProjectsView({ user }) {
+  const isAdmin   = user?.role === 'ADMIN'
+  const isManager = user?.role === 'MANAGER' || isAdmin
+
+  const [projects,     setProjects]     = useState([])
+  const [employees,    setEmployees]    = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [error,        setError]        = useState(null)
+  const [filterStatus, setFilterStatus] = useState('')
+
+  // modal: null | 'create' | 'edit' | 'assign' | 'notes'
+  const [modal,        setModal]        = useState(null)
+  const [activeProj,   setActiveProj]   = useState(null)
+  const [form,         setForm]         = useState({})
+  const [formError,    setFormError]    = useState(null)
+  const [submitting,   setSubmitting]   = useState(false)
+
+  const [notes,        setNotes]        = useState([])
+  const [notesLoading, setNotesLoading] = useState(false)
+  const [newNote,      setNewNote]      = useState('')
+
+  // ── Fetch ────────────────────────────────────────────────────────────────
+  const fetchProjects = useCallback(async () => {
+    setLoading(true); setError(null)
+    try {
+      const params = filterStatus ? { status: filterStatus } : {}
+      const data = await getProjects(params)
+      setProjects(Array.isArray(data) ? data : [])
+    } catch (err) {
+      setError(err?.message || 'Error al cargar proyectos')
+      setProjects([])
+    } finally { setLoading(false) }       // BUG 2 FIX: finally garantiza que loading se apaga
+  }, [filterStatus])
+
+  useEffect(() => { fetchProjects() }, [fetchProjects])
+
+  const fetchEmployees = async () => {
+    try { setEmployees(Array.isArray(await getEmployees()) ? await getEmployees() : []) }
+    catch { setEmployees([]) }
+  }
+
+  const fetchNotes = async (projectId) => {
+    setNotesLoading(true)
+    try { setNotes(Array.isArray(await getNotes(projectId)) ? await getNotes(projectId) : []) }
+    catch { setNotes([]) }
+    finally { setNotesLoading(false) }
+  }
+
+  // ── Modal helpers ────────────────────────────────────────────────────────
+  const closeModal = () => { setModal(null); setActiveProj(null); setFormError(null); setForm({}) }
+
+  const openCreate = () => {
+    setForm({ name:'', description:'', type:'SOFTWARE', managerId: user?.id ?? '' })
+    setFormError(null); setModal('create')
+  }
+
+  const openEdit = (p) => {
+    setActiveProj(p)
+    setForm({ name:p.name||'', description:p.description||'', type:p.type||'SOFTWARE' })
+    setFormError(null); setModal('edit')
+  }
+
+  const openAssign = async (p) => {
+    setActiveProj(p)
+    setForm({ employeeId: p.assignedUserId ?? '' })
+    setFormError(null)
+    await fetchEmployees()
+    setModal('assign')
+  }
+
+  const openNotes = async (p) => {
+    setActiveProj(p); setNewNote('')
+    await fetchNotes(p.id); setModal('notes')
+  }
+
+  // ── Submit handlers ──────────────────────────────────────────────────────
+  const withSubmit = (fn) => async (e) => {
+    e?.preventDefault(); setSubmitting(true); setFormError(null)
+    try { await fn(); closeModal(); fetchProjects() }
+    catch (err) { setFormError(err?.message || 'Error') }
+    finally { setSubmitting(false) }
+  }
+
+  const handleCreate     = withSubmit(() => createProject(form))
+  const handleEdit       = withSubmit(() => updateProject(activeProj.id, form))
+  const handleDelete = async (p) => {
+    if (!window.confirm(`¿Eliminar "${p.name}"?`)) return
+    try { await deleteProject(p.id); fetchProjects() } catch { /* silent */ }
+  }
+  const handleStatusChange = async (p, st) => {
+    try { await updateProjectStatus(p.id, st); fetchProjects() } catch { /* silent */ }
+  }
+  const handleAssign = withSubmit(async () => {
+    if (form.employeeId) {
+      const emp = employees.find(e => String(e.id) === String(form.employeeId))
+      await assignEmployee(activeProj.id, form.employeeId, emp?.name ?? '')
+    } else {
+      await unassignEmployee(activeProj.id)
     }
+  })
+  const handleAddNote = async (e) => {
+    e.preventDefault()
+    if (!newNote.trim()) return
+    setSubmitting(true)
+    try { await addNote(activeProj.id, newNote.trim()); setNewNote(''); await fetchNotes(activeProj.id) }
+    catch { /* silent */ } finally { setSubmitting(false) }
+  }
+  const handleReviewNote = async (noteId, status) => {
+    try { await reviewNote(activeProj.id, noteId, { status, reviewComment:'' }); await fetchNotes(activeProj.id) }
+    catch { /* silent */ }
+  }
+
+  const setF = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+
+  const stats = {
+    total:      projects.length,
+    inProgress: projects.filter(p => p.status === 'IN_PROGRESS').length,
+    completed:  projects.filter(p => p.status === 'COMPLETED').length,
+    planning:   projects.filter(p => p.status === 'PLANNING').length,
+  }
+
+  const inputStyle = {
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box',
   }
 
   return (
-    <>
-      <style>{`
-        @keyframes innovatech-spin { to { transform: rotate(360deg); } }
-        * { box-sizing: border-box; }
-        body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
-        button:hover { opacity:.88; }
-      `}</style>
-
-      <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:T.color.bg }}>
-
-        {/* SIDEBAR */}
-        <aside style={{
-          width:T.sidebar.width, minWidth:T.sidebar.width,
-          background:T.color.sidebarBg,
-          display:'flex', flexDirection:'column',
-          height:'100vh', position:'sticky', top:0, overflowY:'auto',
-        }}>
-          {/* Logo */}
-          <div style={{ padding:'22px 20px 18px', borderBottom:`1px solid ${T.color.sidebarBorder}` }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <div style={{
-                width:34, height:34, borderRadius:T.radius.sm,
-                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
-                display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
-                  <polygon points="12 2 2 7 12 12 22 7 12 2"/>
-                  <polyline points="2 17 12 22 22 17"/>
-                  <polyline points="2 12 12 17 22 12"/>
-                </svg>
-              </div>
-              <div>
-                <div style={{ fontSize:13, fontWeight:700, color:'#e2e8f0', lineHeight:1.2 }}>Innovatech</div>
-                <div style={{ fontSize:11, color:T.color.sidebarText, lineHeight:1.2 }}>Solutions</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Nav */}
-          <nav style={{ flex:1, padding:'12px 0' }}>
-            <div style={{ padding:'6px 20px 8px', fontSize:10, fontWeight:700,
-                          color:'#334155', textTransform:'uppercase', letterSpacing:'0.1em' }}>
-              Principal
-            </div>
-            {visibleItems.map(item => (
-              <button key={item.id} onClick={() => setActiveView(item.id)} style={sidebarItemStyle(item.id)}>
-                <span style={{ flexShrink:0, display:'flex' }}>{item.icon}</span>
-                <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.label}</span>
-              </button>
-            ))}
-          </nav>
-
-          {/* User card */}
-          <div style={{ padding:'16px 18px', borderTop:`1px solid ${T.color.sidebarBorder}`, marginTop:'auto' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
-              <div style={{
-                width:36, height:36, borderRadius:'50%',
-                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
-                display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:15, fontWeight:700, color:'#fff', flexShrink:0,
-              }}>
-                {user.name?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
-              <div style={{ overflow:'hidden' }}>
-                <div style={{ fontSize:13, fontWeight:600, color:'#cbd5e1',
-                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  {user.name}
-                </div>
-                <div style={{ fontSize:11, color:T.color.sidebarText,
-                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  {user.email}
-                </div>
-              </div>
-            </div>
-            <button onClick={handleLogout} style={{
-              width:'100%', background:'rgba(239,68,68,0.1)', color:'#f87171',
-              border:'1px solid rgba(239,68,68,0.2)', borderRadius:T.radius.sm,
-              padding:'7px 12px', fontSize:13, fontWeight:600, cursor:'pointer',
-              display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+    <div>
+      {/* Header row */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24, flexWrap:'wrap', gap:12 }}>
+        <div>
+          <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Gestión de Proyectos</h1>
+          <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>Planificación, ejecución y seguimiento.</p>
+        </div>
+        <div style={{ display:'flex', gap:10, alignItems:'center', flexWrap:'wrap' }}>
+          <select
+            value={filterStatus}
+            onChange={e => setFilterStatus(e.target.value)}
+            style={{ ...inputStyle, width:'auto' }}
+          >
+            <option value="">Todos los estados</option>
+            {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+          </select>
+          {isManager && (
+            <button onClick={openCreate} style={{
+              background:T.color.brand, color:'#fff', border:'none',
+              padding:'8px 16px', borderRadius:T.radius.sm, fontSize:13, fontWeight:600, cursor:'pointer',
             }}>
-              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
-              </svg>
-              Cerrar sesión
+              + Nuevo Proyecto
             </button>
-          </div>
-        </aside>
-
-        {/* MAIN */}
-        <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
-          {/* Header */}
-          <header style={{
-            height:T.header.height, background:T.color.surface,
-            borderBottom:`1px solid ${T.color.border}`,
-            display:'flex', alignItems:'center', justifyContent:'space-between',
-            padding:'0 32px', flexShrink:0, boxShadow:'0 1px 0 rgba(0,0,0,0.06)',
+          )}
+          <button onClick={fetchProjects} style={{
+            background:'transparent', color:T.color.textSecondary,
+            border:`1px solid ${T.color.border}`, padding:'8px 14px',
+            borderRadius:T.radius.sm, fontSize:13, cursor:'pointer',
           }}>
-            <div>
-              <h2 style={{ margin:0, fontSize:16, fontWeight:700, color:T.color.textPrimary }}>{currentItem.label}</h2>
-              <p style={{ margin:0, fontSize:12, color:T.color.textMuted }}>Innovatech Solutions — Plataforma Integrada</p>
-            </div>
-            <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-              <span style={{
-                padding:'4px 12px', borderRadius:99, fontSize:12, fontWeight:600,
-                background:roleConfig.bg, color:roleConfig.color, border:`1px solid ${roleConfig.border}`,
-              }}>
-                {roleLabel}
-              </span>
-              <div style={{
-                width:36, height:36, borderRadius:'50%',
-                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
-                display:'flex', alignItems:'center', justifyContent:'center',
-                fontSize:15, fontWeight:700, color:'#fff',
-              }}>
-                {user.name?.charAt(0)?.toUpperCase() || 'U'}
-              </div>
-            </div>
-          </header>
-
-          {/* Content */}
-          <main style={{ flex:1, overflowY:'auto', padding:32 }}>
-            {renderView()}
-          </main>
+            ↺ Actualizar
+          </button>
         </div>
       </div>
-    </>
+
+      {/* KPI cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:24 }}>
+        <StatCard label="Total"        value={stats.total}      loading={loading} accent={T.color.brand}   />
+        <StatCard label="En progreso"  value={stats.inProgress} loading={loading} accent={T.color.warning} />
+        <StatCard label="Completados"  value={stats.completed}  loading={loading} accent={T.color.success} />
+        <StatCard label="Planificación"value={stats.planning}   loading={loading} accent={T.color.info}    />
+      </div>
+
+      {error && <ErrorBanner message={error} onRetry={fetchProjects}/>}
+
+      {/* Table */}
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+        {loading ? (
+          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
+        ) : projects.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center', color:T.color.textMuted }}>
+            <div style={{ fontSize:36, marginBottom:10 }}>📂</div>
+            No hay proyectos{filterStatus ? ` con estado "${STATUS_LABELS[filterStatus]}"` : ''}.
+          </div>
+        ) : (
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:T.color.bg }}>
+                  {['#','Nombre','Tipo','Estado','Asignado a','Acciones'].map(h => (
+                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
+                                         fontWeight:600, color:T.color.textMuted,
+                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {projects.map((p, i) => (
+                  <tr key={p.id} style={{
+                    borderTop:`1px solid ${T.color.border}`,
+                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
+                  }}>
+                    <td style={{ padding:'11px 16px', color:T.color.textMuted, fontSize:13 }}>#{p.id}</td>
+                    <td style={{ padding:'11px 16px', fontWeight:600, color:T.color.textPrimary, fontSize:14 }}>{p.name}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{p.type}</td>
+                    <td style={{ padding:'11px 16px' }}>
+                      {isManager ? (
+                        <select
+                          value={p.status}
+                          onChange={e => handleStatusChange(p, e.target.value)}
+                          style={{ ...inputStyle, width:'auto', padding:'3px 8px', fontSize:12, fontWeight:600 }}
+                        >
+                          {STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+                        </select>
+                      ) : (
+                        <StatusBadge status={p.status}/>
+                      )}
+                    </td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>
+                      {p.assignedUserName || <span style={{ fontStyle:'italic' }}>Sin asignar</span>}
+                    </td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                        <Btn onClick={() => openNotes(p)} variant="ghost">📋 Notas</Btn>
+                        {isManager && (
+                          <>
+                            <Btn onClick={() => openEdit(p)} variant="ghost">✏ Editar</Btn>
+                            <Btn onClick={() => openAssign(p)} variant="ghost">👤 Asignar</Btn>
+                          </>
+                        )}
+                        {isAdmin && <Btn onClick={() => handleDelete(p)} variant="danger">🗑</Btn>}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ── Modal Crear ──────────────────────────────────────────────────────── */}
+      {modal === 'create' && (
+        <Modal title="Nuevo Proyecto" onClose={closeModal}>
+          <form onSubmit={handleCreate}>
+            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre del proyecto"/></FieldRow>
+            <FieldRow label="Descripción">
+              <textarea value={form.description} onChange={setF('description')} rows={3}
+                style={{ ...inputStyle, resize:'vertical' }} placeholder="Descripción opcional"/>
+            </FieldRow>
+            <FieldRow label="Tipo *">
+              <SelectInput value={form.type} onChange={setF('type')} options={TYPES.map(t => ({ value:t, label:t }))}/>
+            </FieldRow>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Creando…' : 'Crear Proyecto'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Modal Editar ─────────────────────────────────────────────────────── */}
+      {modal === 'edit' && activeProj && (
+        <Modal title={`Editar: ${activeProj.name}`} onClose={closeModal}>
+          <form onSubmit={handleEdit}>
+            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre"/></FieldRow>
+            <FieldRow label="Descripción">
+              <textarea value={form.description} onChange={setF('description')} rows={3}
+                style={{ ...inputStyle, resize:'vertical' }}/>
+            </FieldRow>
+            <FieldRow label="Tipo">
+              <SelectInput value={form.type} onChange={setF('type')} options={TYPES.map(t => ({ value:t, label:t }))}/>
+            </FieldRow>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Guardando…' : 'Guardar'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Modal Asignar ────────────────────────────────────────────────────── */}
+      {modal === 'assign' && activeProj && (
+        <Modal title={`Asignar empleado — ${activeProj.name}`} onClose={closeModal} width="420px">
+          <form onSubmit={handleAssign}>
+            <FieldRow label="Empleado">
+              <SelectInput
+                value={form.employeeId}
+                onChange={setF('employeeId')}
+                placeholder="Sin asignar"
+                options={employees.map(e => ({ value: e.id, label: `${e.name || e.email}` }))}
+              />
+            </FieldRow>
+            <p style={{ color:T.color.textMuted, fontSize:12, margin:'0 0 16px' }}>
+              Selecciona "Sin asignar" para retirar la asignación actual.
+            </p>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Guardando…' : 'Confirmar'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Modal Notas ──────────────────────────────────────────────────────── */}
+      {modal === 'notes' && activeProj && (
+        <Modal title={`Notas — ${activeProj.name}`} onClose={closeModal} width="600px">
+          {notesLoading ? (
+            <div style={{ padding:24, display:'flex', justifyContent:'center' }}><Spinner/></div>
+          ) : notes.length === 0 ? (
+            <p style={{ color:T.color.textMuted, textAlign:'center', fontStyle:'italic', margin:'8px 0 20px' }}>
+              Sin notas de avance.
+            </p>
+          ) : (
+            <div style={{ maxHeight:320, overflowY:'auto', marginBottom:20 }}>
+              {notes.map(n => (
+                <div key={n.id} style={{
+                  background:T.color.bg, borderRadius:T.radius.sm,
+                  border:`1px solid ${T.color.border}`, padding:14, marginBottom:10,
+                }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', marginBottom:6 }}>
+                    <span style={{ color:T.color.textMuted, fontSize:12 }}>
+                      {n.authorName || `#${n.authorId}`} · {n.createdAt ? new Date(n.createdAt).toLocaleDateString('es-CL') : ''}
+                    </span>
+                    <StatusBadge status={n.status === 'APPROVED' ? 'COMPLETED' : n.status === 'REJECTED' ? 'CANCELLED' : 'PLANNING'}/>
+                  </div>
+                  <p style={{ color:T.color.textPrimary, margin:'0 0 8px', fontSize:14 }}>{n.content}</p>
+                  {n.reviewComment && (
+                    <p style={{ color:T.color.textMuted, fontSize:12, fontStyle:'italic', margin:'0 0 8px' }}>
+                      Revisión: {n.reviewComment}
+                    </p>
+                  )}
+                  {isManager && n.status === 'PENDING' && (
+                    <div style={{ display:'flex', gap:8 }}>
+                      <Btn onClick={() => handleReviewNote(n.id, 'APPROVED')} variant="success">✓ Aprobar</Btn>
+                      <Btn onClick={() => handleReviewNote(n.id, 'REJECTED')} variant="danger">✗ Rechazar</Btn>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          <div style={{ borderTop:`1px solid ${T.color.border}`, paddingTop:16 }}>
+            <form onSubmit={handleAddNote} style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
+              <textarea
+                value={newNote}
+                onChange={e => setNewNote(e.target.value)}
+                placeholder="Escribe una nota de avance…"
+                rows={2}
+                style={{
+                  flex:1, padding:'8px 12px', borderRadius:T.radius.sm,
+                  border:`1px solid ${T.color.border}`, fontSize:14,
+                  color:T.color.textPrimary, background:T.color.surface,
+                  resize:'none', boxSizing:'border-box',
+                }}
+              />
+              <Btn type="submit" disabled={submitting || !newNote.trim()}>
+                {submitting ? '…' : 'Agregar'}
+              </Btn>
+            </form>
+          </div>
+        </Modal>
+      )}
+    </div>
   )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/ResourcesView.jsx">
+import { useState, useEffect, useCallback } from 'react'
+import {
+  getResources, getAvailableResources,
+  createResource, deleteResource, updateAvailability,
+} from '../../services/resourceService.js'
+import { T } from './tokens.js'
+import { Spinner, StatCard, Modal, Btn, FieldRow, TextInput, SelectInput, ErrorBanner } from './atoms.jsx'
+
+const DEPARTMENTS = ['Engineering', 'Design', 'QA', 'DevOps', 'Management', 'Consulting']
+const ROLES       = ['DEVELOPER', 'DESIGNER', 'QA', 'DEVOPS', 'MANAGER', 'CONSULTANT']
+
+const ROLE_COLOR = {
+  DEVELOPER:'#6366f1', DESIGNER:'#ec4899',
+  QA:'#f59e0b',        DEVOPS:'#14b8a6',
+  MANAGER:'#8b5cf6',   CONSULTANT:'#f97316',
+}
+
+export default function ResourcesView({ user }) {
+  const isAdmin = user?.role === 'ADMIN'
+
+  const [resources,  setResources]  = useState([])
+  const [available,  setAvailable]  = useState([])
+  const [loading,    setLoading]    = useState(true)
+  const [error,      setError]      = useState(null)
+  const [modal,      setModal]      = useState(null)   // null | 'create'
+  const [form,       setForm]       = useState({})
+  const [formError,  setFormError]  = useState(null)
+  const [submitting, setSubmitting] = useState(false)
+
+  const fetchAll = useCallback(async () => {
+    setLoading(true); setError(null)
+    try {
+      const [all, avail] = await Promise.all([getResources(), getAvailableResources()])
+      setResources(Array.isArray(all) ? all : [])
+      setAvailable(Array.isArray(avail) ? avail : [])
+    } catch (err) {
+      setError(err?.message || 'Error al cargar recursos')
+      setResources([]); setAvailable([])
+    } finally { setLoading(false) }      // BUG 2 FIX: finally garantiza que loading se apaga
+  }, [])
+
+  useEffect(() => { fetchAll() }, [fetchAll])
+
+  const openCreate = () => {
+    setForm({ name:'', email:'', department: DEPARTMENTS[0], role:'DEVELOPER' })
+    setFormError(null); setModal('create')
+  }
+  const closeModal = () => { setModal(null); setFormError(null); setForm({}) }
+
+  const handleCreate = async (e) => {
+    e.preventDefault(); setSubmitting(true); setFormError(null)
+    try { await createResource(form); closeModal(); fetchAll() }
+    catch (err) { setFormError(err?.message || 'Error al crear recurso') }
+    finally { setSubmitting(false) }
+  }
+
+  const handleToggleAvailability = async (r) => {
+    try { await updateAvailability(r.id, !r.available); fetchAll() }
+    catch { /* silent */ }
+  }
+
+  const handleDelete = async (r) => {
+    if (!window.confirm(`¿Eliminar a "${r.name}"?`)) return
+    try { await deleteResource(r.id); fetchAll() }
+    catch { /* silent */ }
+  }
+
+  const setF = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
+
+  const inputStyle = {
+    width:'100%', padding:'8px 12px', borderRadius:T.radius.sm,
+    border:`1px solid ${T.color.border}`, fontSize:14,
+    color:T.color.textPrimary, background:T.color.surface,
+    outline:'none', boxSizing:'border-box',
+  }
+
+  return (
+    <div>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:24 }}>
+        <div>
+          <h1 style={{ margin:0, fontSize:24, fontWeight:700, color:T.color.textPrimary }}>Recursos Humanos</h1>
+          <p style={{ margin:'4px 0 0', color:T.color.textSecondary, fontSize:14 }}>Disponibilidad y asignación del equipo.</p>
+        </div>
+        <div style={{ display:'flex', gap:10 }}>
+          {isAdmin && (
+            <button onClick={openCreate} style={{
+              background:T.color.brand, color:'#fff', border:'none',
+              padding:'8px 16px', borderRadius:T.radius.sm, fontSize:13, fontWeight:600, cursor:'pointer',
+            }}>
+              + Nuevo Recurso
+            </button>
+          )}
+          <button onClick={fetchAll} style={{
+            background:'transparent', color:T.color.textSecondary,
+            border:`1px solid ${T.color.border}`, padding:'8px 14px',
+            borderRadius:T.radius.sm, fontSize:13, cursor:'pointer',
+          }}>
+            ↺ Actualizar
+          </button>
+        </div>
+      </div>
+
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:16, marginBottom:24 }}>
+        <StatCard label="Total"       value={resources.length}                     loading={loading} accent={T.color.brand}   />
+        <StatCard label="Disponibles" value={available.length}                     loading={loading} accent={T.color.success} />
+        <StatCard label="Asignados"   value={resources.length - available.length}  loading={loading} accent={T.color.warning} />
+        <StatCard label="Ocupación"
+          value={resources.length > 0 ? `${Math.round((1-available.length/resources.length)*100)}%` : '—'}
+          loading={loading} accent={T.color.info}/>
+      </div>
+
+      {error && <ErrorBanner message={error} onRetry={fetchAll}/>}
+
+      <div style={{ background:T.color.surface, border:`1px solid ${T.color.border}`,
+                    borderRadius:T.radius.md, boxShadow:T.shadow.sm, overflow:'hidden' }}>
+        {loading ? (
+          <div style={{ padding:48, display:'flex', justifyContent:'center' }}><Spinner/></div>
+        ) : resources.length === 0 ? (
+          <div style={{ padding:48, textAlign:'center', color:T.color.textMuted }}>
+            <div style={{ fontSize:36, marginBottom:10 }}>👥</div>
+            No hay recursos registrados.
+          </div>
+        ) : (
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:T.color.bg }}>
+                  {['Nombre','Email','Departamento','Rol','Estado','Acciones'].map(h => (
+                    <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:12,
+                                         fontWeight:600, color:T.color.textMuted,
+                                         textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {resources.map((r, i) => (
+                  <tr key={r.id} style={{
+                    borderTop:`1px solid ${T.color.border}`,
+                    background: i % 2 === 0 ? T.color.surface : '#fafafa',
+                  }}>
+                    <td style={{ padding:'11px 16px', fontWeight:600, color:T.color.textPrimary, fontSize:14 }}>{r.name}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{r.email}</td>
+                    <td style={{ padding:'11px 16px', color:T.color.textSecondary, fontSize:13 }}>{r.department}</td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <span style={{
+                        display:'inline-block', padding:'2px 10px', borderRadius:99,
+                        fontSize:12, fontWeight:600,
+                        background:`${ROLE_COLOR[r.role]||T.color.brand}18`,
+                        color: ROLE_COLOR[r.role] || T.color.brand,
+                      }}>
+                        {r.role}
+                      </span>
+                    </td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <span style={{
+                        display:'inline-flex', alignItems:'center', gap:6,
+                        fontSize:13, fontWeight:500,
+                        color: r.available ? T.color.success : T.color.warning,
+                      }}>
+                        <span style={{
+                          width:8, height:8, borderRadius:'50%',
+                          background: r.available ? T.color.success : T.color.warning,
+                        }}/>
+                        {r.available ? 'Disponible' : 'Asignado'}
+                      </span>
+                    </td>
+                    <td style={{ padding:'11px 16px' }}>
+                      <div style={{ display:'flex', gap:6 }}>
+                        {isAdmin && (
+                          <>
+                            <Btn onClick={() => handleToggleAvailability(r)} variant="ghost">
+                              {r.available ? '🔒 Asignar' : '🔓 Liberar'}
+                            </Btn>
+                            <Btn onClick={() => handleDelete(r)} variant="danger">🗑</Btn>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Modal Crear Recurso */}
+      {modal === 'create' && (
+        <Modal title="Nuevo Recurso" onClose={closeModal}>
+          <form onSubmit={handleCreate}>
+            <FieldRow label="Nombre *"><TextInput value={form.name} onChange={setF('name')} placeholder="Nombre completo"/></FieldRow>
+            <FieldRow label="Email *"><TextInput value={form.email} onChange={setF('email')} placeholder="correo@empresa.cl" type="email"/></FieldRow>
+            <FieldRow label="Departamento">
+              <SelectInput value={form.department} onChange={setF('department')}
+                options={DEPARTMENTS.map(d => ({ value:d, label:d }))}/>
+            </FieldRow>
+            <FieldRow label="Rol">
+              <SelectInput value={form.role} onChange={setF('role')}
+                options={ROLES.map(r => ({ value:r, label:r }))}/>
+            </FieldRow>
+            {formError && <p style={{ color:T.color.error, fontSize:13, marginBottom:12 }}>⚠ {formError}</p>}
+            <div style={{ display:'flex', justifyContent:'flex-end', gap:10 }}>
+              <Btn onClick={closeModal} variant="ghost">Cancelar</Btn>
+              <Btn type="submit" disabled={submitting}>{submitting ? 'Creando…' : 'Crear Recurso'}</Btn>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/dashboard/tokens.js">
+/** Design tokens compartidos entre todas las vistas del Dashboard. */
+export const T = {
+  sidebar: { width: 248 },
+  header:  { height: 64 },
+  color: {
+    sidebarBg:        '#0f172a',
+    sidebarBorder:    'rgba(255,255,255,0.06)',
+    sidebarText:      '#64748b',
+    sidebarTextHover: '#cbd5e1',
+    sidebarActive:    '#a5b4fc',
+    sidebarActiveBg:  'rgba(99,102,241,0.14)',
+    sidebarActiveBar: '#6366f1',
+    sidebarHover:     'rgba(255,255,255,0.04)',
+    brand:            '#6366f1',
+    brandDark:        '#4f46e5',
+    brandLight:       '#e0e7ff',
+    bg:               '#f1f5f9',
+    surface:          '#ffffff',
+    border:           '#e2e8f0',
+    borderSoft:       '#f1f5f9',
+    textPrimary:      '#0f172a',
+    textSecondary:    '#475569',
+    textMuted:        '#94a3b8',
+    success:          '#10b981',
+    warning:          '#f59e0b',
+    error:            '#ef4444',
+    info:             '#3b82f6',
+    roleAdmin:    { bg:'rgba(124,58,237,0.1)',  color:'#7c3aed', border:'rgba(124,58,237,0.25)' },
+    roleManager:  { bg:'rgba(8,145,178,0.1)',   color:'#0891b2', border:'rgba(8,145,178,0.25)'  },
+    roleEmployee: { bg:'rgba(5,150,105,0.1)',   color:'#059669', border:'rgba(5,150,105,0.25)'  },
+  },
+  shadow: {
+    sm: '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
+    md: '0 4px 12px rgba(0,0,0,0.08)',
+    lg: '0 10px 30px rgba(0,0,0,0.12)',
+  },
+  radius: { sm:'6px', md:'10px', lg:'16px' },
 }
 </file>
 
@@ -3774,53 +3469,82 @@ function PasswordInput({ id, value, onChange, showPass, onToggle, isInvalid }) {
 }
 </file>
 
-<file path="innovatech-frontend-valdes-munoz/src/services/authService.js">
+<file path="innovatech-frontend-valdes-munoz/src/services/analiticaService.js">
 import api, { call } from './api.js'
 
-export const login       = (credentials) => call(() => api.post('/api/auth/login', credentials).then(r => r.data))
-export const register    = (userData)    => call(() => api.post('/api/auth/register', userData).then(r => r.data))
-export const getUsers    = ()            => call(() => api.get('/api/auth/users').then(r => r.data))
-export const getEmployees= ()            => getUsers().then(list => list.filter(u => u.role === 'EMPLOYEE'))
+const BASE = '/api/v1/analitica'
+
+export const getAllMetrics     = ()          => call(() => api.get(`${BASE}/metricas`).then(r => r.data))
+export const getProjectMetrics = (projectId) => call(() => api.get(`${BASE}/metricas/proyecto/${projectId}`).then(r => r.data))
+export const getSummary        = ()          => call(() => api.get(`${BASE}/resumen`).then(r => r.data))
 </file>
 
-<file path="innovatech-frontend-valdes-munoz/src/services/projectService.js">
-import api, { call } from './api.js'
+<file path="innovatech-frontend-valdes-munoz/src/services/api.js">
+/**
+ * Centralized Axios instance.
+ * ROOT CAUSE BUG 2: los servicios usaban localStorage.getItem('token')
+ * pero AuthContext persiste con clave 'innovatech_token'.
+ * Este interceptor unifica la clave y añade timeout para evitar spinners infinitos.
+ */
+import axios from 'axios'
 
-const BASE = '/api/projects'
+const TOKEN_KEY = 'innovatech_token'
 
-export const getProjects         = (params = {})             => call(() => api.get(`${BASE}/`, { params }).then(r => r.data))
-export const getProjectById      = (id)                      => call(() => api.get(`${BASE}/${id}`).then(r => r.data))
-export const createProject       = (data)                    => call(() => api.post(`${BASE}/`, data).then(r => r.data))
-export const updateProject       = (id, data)                => call(() => api.put(`${BASE}/${id}`, data).then(r => r.data))
-export const deleteProject       = (id)                      => call(() => api.delete(`${BASE}/${id}`))
-export const updateProjectStatus = (id, status)              => call(() => api.patch(`${BASE}/${id}/status`, { status }).then(r => r.data))
-export const assignEmployee      = (id, employeeId, name)    => call(() => api.patch(`${BASE}/${id}/assign`, { employeeId, employeeName: name }).then(r => r.data))
-export const unassignEmployee    = (id)                      => call(() => api.delete(`${BASE}/${id}/assign`).then(r => r.data))
-export const getNotes            = (id)                      => call(() => api.get(`${BASE}/${id}/notes`).then(r => r.data))
-export const addNote             = (id, content)             => call(() => api.post(`${BASE}/${id}/notes`, { content }).then(r => r.data))
-export const reviewNote          = (id, noteId, data)        => call(() => api.patch(`${BASE}/${id}/notes/${noteId}/review`, data).then(r => r.data))
-</file>
-
-<file path="innovatech-frontend-valdes-munoz/vite.config.js">
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    host: true,   // Docker: expone Vite en 0.0.0.0, no solo en el loopback del contenedor
-    port: 5173,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true,
-        secure: false,
-        ws: true,
-        // Sin rewrite: el BFF ya monta sus rutas bajo /api/*
-      },
-    },
-  },
+const api = axios.create({
+  timeout: 10000, // 10 s — previene loading infinito si el BFF no responde
 })
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_KEY)
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
+
+/** Normaliza cualquier error de Axios en un objeto {message, status} */
+export function parseError(err) {
+  if (err.response) {
+    const msg = err.response.data?.message || err.response.data?.error || 'Error del servidor'
+    return { message: msg, status: err.response.status }
+  }
+  if (err.request) return { message: 'No se pudo conectar con el servidor', status: 0 }
+  return { message: err.message || 'Error inesperado', status: -1 }
+}
+
+/** Wrapper que normaliza errores y garantiza que siempre lanza {message,status} */
+export async function call(fn) {
+  try {
+    return await fn()
+  } catch (err) {
+    throw parseError(err)
+  }
+}
+
+export default api
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/notifService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/v1/notificaciones'
+
+export const getNotifications      = (projectId)      => call(() => api.get(`${BASE}/proyecto/${projectId}`).then(r => r.data))
+export const getUnreadNotifications= (projectId)      => call(() => api.get(`${BASE}/proyecto/${projectId}/no-leidas`).then(r => r.data))
+export const markAsRead            = (notificationId) => call(() => api.patch(`${BASE}/${notificationId}/read`, {}))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/resourceService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/resources'
+
+export const getResources           = ()                          => call(() => api.get(`${BASE}/`).then(r => r.data))
+export const getAvailableResources  = ()                          => call(() => api.get(`${BASE}/available`).then(r => r.data))
+export const getResourcesByDepartment=(dept)                      => call(() => api.get(`${BASE}/department/${encodeURIComponent(dept)}`).then(r => r.data))
+export const getResourceById        = (id)                        => call(() => api.get(`${BASE}/${id}`).then(r => r.data))
+export const createResource         = (data)                      => call(() => api.post(`${BASE}/`, data).then(r => r.data))
+export const updateAvailability     = (id, available)             => call(() => api.patch(`${BASE}/${id}/availability`, { available }).then(r => r.data))
+export const assignResourceToProject= (id, projectId, projectName)=> call(() => api.patch(`${BASE}/${id}/assign`, { projectId, projectName }).then(r => r.data))
+export const deleteResource         = (id)                        => call(() => api.delete(`${BASE}/${id}`))
 </file>
 
 <file path="README.md">
@@ -4164,6 +3888,281 @@ npm run preview
 ---
 
 **Instituto DuocUC 2026 — DSY1106 Desarrollo Fullstack III —*
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/components/PrivateRoute.jsx">
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+
+/** Guarda de ruta: redirige a /login si no hay sesión activa. */
+export default function PrivateRoute({ children }) {
+  const { isAuthenticated, isLoading } = useAuth()
+  if (isLoading) return null
+  return isAuthenticated ? children : <Navigate to="/login" replace />
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/pages/DashboardPage.jsx">
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext.jsx'
+import { T } from './dashboard/tokens.js'
+import ProjectsView      from './dashboard/ProjectsView.jsx'
+import ResourcesView     from './dashboard/ResourcesView.jsx'
+import KpiView           from './dashboard/KpiView.jsx'
+import NotificationsView from './dashboard/NotificationsView.jsx'
+
+const NAV_ITEMS = [
+  {
+    id:'proyectos', label:'Proyectos', roles:['ADMIN','MANAGER','EMPLOYEE'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M2 6a2 2 0 012-2h5l2 2h9a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+    </svg>),
+  },
+  {
+    id:'recursos', label:'Recursos Humanos', roles:['ADMIN','MANAGER'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H2v-2a4 4 0 013-3.87m12-5.13a4 4 0 11-8 0 4 4 0 018 0zM7 8a4 4 0 110 8 4 4 0 010-8z"/>
+    </svg>),
+  },
+  {
+    id:'kpis', label:'Métricas / KPIs', roles:['ADMIN','MANAGER'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M3 3v18h18"/><path d="M18 9l-5 5-2-2-4 4"/>
+    </svg>),
+  },
+  {
+    id:'notificaciones', label:'Notificaciones', roles:['ADMIN','MANAGER','EMPLOYEE'],
+    icon:(<svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" viewBox="0 0 24 24">
+      <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.993M9 17H4l1.405-1.405A2.032 2.032 0 006 14.158V11a6 6 0 016-6"/>
+      <path d="M13 21a1 1 0 01-2 0"/>
+    </svg>),
+  },
+]
+
+export default function DashboardPage() {
+  const { user, logout } = useAuth()
+  const navigate          = useNavigate()
+  const [activeView, setActiveView] = useState('proyectos')
+
+  useEffect(() => {
+    if (!user) navigate('/login', { replace:true })
+  }, [user, navigate])
+
+  if (!user) return null
+
+  const role        = user.role || 'EMPLOYEE'
+  const roleConfig  = T.color[`role${role[0]}${role.slice(1).toLowerCase()}`] || T.color.roleEmployee
+  const roleLabel   = { ADMIN:'Administrador', MANAGER:'Manager', EMPLOYEE:'Empleado' }[role] || role
+  const visibleItems= NAV_ITEMS.filter(it => it.roles.includes(role))
+  const currentItem = visibleItems.find(it => it.id === activeView) || visibleItems[0]
+
+  const handleLogout = () => { logout(); navigate('/login', { replace:true }) }
+
+  const sidebarItemStyle = (id) => ({
+    display:'flex', alignItems:'center', gap:12,
+    padding:'10px 16px', margin:'1px 10px',
+    borderRadius:T.radius.sm,
+    cursor:'pointer', fontSize:14, fontWeight:500,
+    border:'none', width:'calc(100% - 20px)', textAlign:'left',
+    transition:'background 0.12s, color 0.12s',
+    ...(currentItem.id === id ? {
+      background:T.color.sidebarActiveBg,
+      color:T.color.sidebarActive,
+      boxShadow:`inset 3px 0 0 ${T.color.sidebarActiveBar}`,
+    } : {
+      background:'transparent',
+      color:T.color.sidebarText,
+    }),
+  })
+
+  const renderView = () => {
+    switch (currentItem.id) {
+      case 'proyectos':      return <ProjectsView      user={user}/>
+      case 'recursos':       return <ResourcesView     user={user}/>
+      case 'kpis':           return <KpiView/>
+      case 'notificaciones': return <NotificationsView/>
+      default:               return <ProjectsView      user={user}/>
+    }
+  }
+
+  return (
+    <>
+      <style>{`
+        @keyframes innovatech-spin { to { transform: rotate(360deg); } }
+        * { box-sizing: border-box; }
+        body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+        button:hover { opacity:.88; }
+      `}</style>
+
+      <div style={{ display:'flex', height:'100vh', overflow:'hidden', background:T.color.bg }}>
+
+        {/* SIDEBAR */}
+        <aside style={{
+          width:T.sidebar.width, minWidth:T.sidebar.width,
+          background:T.color.sidebarBg,
+          display:'flex', flexDirection:'column',
+          height:'100vh', position:'sticky', top:0, overflowY:'auto',
+        }}>
+          {/* Logo */}
+          <div style={{ padding:'22px 20px 18px', borderBottom:`1px solid ${T.color.sidebarBorder}` }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+              <div style={{
+                width:34, height:34, borderRadius:T.radius.sm,
+                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
+                display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0,
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+                  <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+                  <polyline points="2 17 12 22 22 17"/>
+                  <polyline points="2 12 12 17 22 12"/>
+                </svg>
+              </div>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:'#e2e8f0', lineHeight:1.2 }}>Innovatech</div>
+                <div style={{ fontSize:11, color:T.color.sidebarText, lineHeight:1.2 }}>Solutions</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Nav */}
+          <nav style={{ flex:1, padding:'12px 0' }}>
+            <div style={{ padding:'6px 20px 8px', fontSize:10, fontWeight:700,
+                          color:'#334155', textTransform:'uppercase', letterSpacing:'0.1em' }}>
+              Principal
+            </div>
+            {visibleItems.map(item => (
+              <button key={item.id} onClick={() => setActiveView(item.id)} style={sidebarItemStyle(item.id)}>
+                <span style={{ flexShrink:0, display:'flex' }}>{item.icon}</span>
+                <span style={{ overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{item.label}</span>
+              </button>
+            ))}
+          </nav>
+
+          {/* User card */}
+          <div style={{ padding:'16px 18px', borderTop:`1px solid ${T.color.sidebarBorder}`, marginTop:'auto' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
+              <div style={{
+                width:36, height:36, borderRadius:'50%',
+                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:15, fontWeight:700, color:'#fff', flexShrink:0,
+              }}>
+                {user.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+              <div style={{ overflow:'hidden' }}>
+                <div style={{ fontSize:13, fontWeight:600, color:'#cbd5e1',
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {user.name}
+                </div>
+                <div style={{ fontSize:11, color:T.color.sidebarText,
+                              overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                  {user.email}
+                </div>
+              </div>
+            </div>
+            <button onClick={handleLogout} style={{
+              width:'100%', background:'rgba(239,68,68,0.1)', color:'#f87171',
+              border:'1px solid rgba(239,68,68,0.2)', borderRadius:T.radius.sm,
+              padding:'7px 12px', fontSize:13, fontWeight:600, cursor:'pointer',
+              display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+            }}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>
+              </svg>
+              Cerrar sesión
+            </button>
+          </div>
+        </aside>
+
+        {/* MAIN */}
+        <div style={{ flex:1, display:'flex', flexDirection:'column', overflow:'hidden' }}>
+          {/* Header */}
+          <header style={{
+            height:T.header.height, background:T.color.surface,
+            borderBottom:`1px solid ${T.color.border}`,
+            display:'flex', alignItems:'center', justifyContent:'space-between',
+            padding:'0 32px', flexShrink:0, boxShadow:'0 1px 0 rgba(0,0,0,0.06)',
+          }}>
+            <div>
+              <h2 style={{ margin:0, fontSize:16, fontWeight:700, color:T.color.textPrimary }}>{currentItem.label}</h2>
+              <p style={{ margin:0, fontSize:12, color:T.color.textMuted }}>Innovatech Solutions — Plataforma Integrada</p>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+              <span style={{
+                padding:'4px 12px', borderRadius:99, fontSize:12, fontWeight:600,
+                background:roleConfig.bg, color:roleConfig.color, border:`1px solid ${roleConfig.border}`,
+              }}>
+                {roleLabel}
+              </span>
+              <div style={{
+                width:36, height:36, borderRadius:'50%',
+                background:`linear-gradient(135deg,${T.color.brand},${T.color.brandDark})`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:15, fontWeight:700, color:'#fff',
+              }}>
+                {user.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
+            </div>
+          </header>
+
+          {/* Content */}
+          <main style={{ flex:1, overflowY:'auto', padding:32 }}>
+            {renderView()}
+          </main>
+        </div>
+      </div>
+    </>
+  )
+}
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/authService.js">
+import api, { call } from './api.js'
+
+export const login       = (credentials) => call(() => api.post('/api/auth/login', credentials).then(r => r.data))
+export const register    = (userData)    => call(() => api.post('/api/auth/register', userData).then(r => r.data))
+export const getUsers    = ()            => call(() => api.get('/api/auth/users').then(r => r.data))
+export const getEmployees= ()            => getUsers().then(list => list.filter(u => u.role === 'EMPLOYEE'))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/src/services/projectService.js">
+import api, { call } from './api.js'
+
+const BASE = '/api/projects'
+
+export const getProjects         = (params = {})             => call(() => api.get(`${BASE}/`, { params }).then(r => r.data))
+export const getProjectById      = (id)                      => call(() => api.get(`${BASE}/${id}`).then(r => r.data))
+export const createProject       = (data)                    => call(() => api.post(`${BASE}/`, data).then(r => r.data))
+export const updateProject       = (id, data)                => call(() => api.put(`${BASE}/${id}`, data).then(r => r.data))
+export const deleteProject       = (id)                      => call(() => api.delete(`${BASE}/${id}`))
+export const updateProjectStatus = (id, status)              => call(() => api.patch(`${BASE}/${id}/status`, { status }).then(r => r.data))
+export const assignEmployee      = (id, employeeId, name)    => call(() => api.patch(`${BASE}/${id}/assign`, { employeeId, employeeName: name }).then(r => r.data))
+export const unassignEmployee    = (id)                      => call(() => api.delete(`${BASE}/${id}/assign`).then(r => r.data))
+export const getNotes            = (id)                      => call(() => api.get(`${BASE}/${id}/notes`).then(r => r.data))
+export const addNote             = (id, content)             => call(() => api.post(`${BASE}/${id}/notes`, { content }).then(r => r.data))
+export const reviewNote          = (id, noteId, data)        => call(() => api.patch(`${BASE}/${id}/notes/${noteId}/review`, data).then(r => r.data))
+</file>
+
+<file path="innovatech-frontend-valdes-munoz/vite.config.js">
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    host: true,
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000', // <-- AQUÍ ESTÁ EL CAMBIO CLAVE
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+    },
+  },
+})
 </file>
 
 </files>
