@@ -20,5 +20,7 @@ jobs:
         cache-dependency-path: innovatech-frontend-valdes-munoz/package-lock.json
     - name: Install dependencies
       run: npm install
+    - name: Sync shared test suite
+      run: cp -r "../CodigosTest_Backend&Frontend/." "./src/__tests__/"
     - name: Run Vitest
       run: npm run test -- --run
